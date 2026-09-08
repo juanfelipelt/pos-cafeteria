@@ -12,4 +12,6 @@ class ProveedorModel(Base):
     telefono = Column(String, nullable=False)
     email = Column(String, nullable=False, default="")
     direccion = Column(String, nullable=False, default="")
+    tipo_identificacion = Column(String, nullable=False, default="")
+    identificacion = Column(String, nullable=False, default="")
     estado = Column(Boolean, nullable=False, default=True)

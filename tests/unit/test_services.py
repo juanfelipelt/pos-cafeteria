@@ -24,13 +24,13 @@ class TestAuthService:
         usuarios = FakeUsuarioRepository()
         service = AuthService(usuarios, FakeSession())
 
-        service.registrar("Felipe", "f@x.com", "secreto")
-        assert service.login("f@x.com", "secreto")
+        service.registrar("Felipe", "f@x.com", "secreto123")
+        assert service.login("f@x.com", "secreto123")
 
     def test_login_password_incorrecto(self):
         usuarios = FakeUsuarioRepository()
         service = AuthService(usuarios, FakeSession())
-        service.registrar("Felipe", "f@x.com", "secreto")
+        service.registrar("Felipe", "f@x.com", "secreto123")
 
         with pytest.raises(UnauthorizedError):
             service.login("f@x.com", "equivocada")

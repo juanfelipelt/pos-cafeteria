@@ -39,6 +39,7 @@ export default function POS() {
 
   const [modal, setModal] = useState<Producto | null>(null);
   const [cantidad, setCantidad] = useState(1);
+  const [cartOpen, setCartOpen] = useState(false);
 
   async function cargar() {
     const [ps, cs] = await Promise.all([
@@ -52,6 +53,10 @@ export default function POS() {
   useEffect(() => {
     cargar();
   }, []);
+
+  useEffect(() => {
+    if (cart.length === 0) setCartOpen(false);
+  }, [cart]);
 
   const visibles = useMemo(
     () => (filtro ? productos.filter((p) => p.categoria_id === filtro) : productos),
@@ -98,6 +103,7 @@ export default function POS() {
       ];
     });
     setModal(null);
+    setCartOpen(true);
   }
 
   function incrementar(producto_id: string) {
@@ -145,11 +151,25 @@ export default function POS() {
       setMensaje(`Venta registrada por ${formatMoney(total)}`);
       setCart([]);
       setMonto(0);
+      setCartOpen(false);
       await cargar();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cobrar");
     }
   }
+
+  const cartHead = (
+    <div className="cart-head">
+      <h3>Cuenta</h3>
+      <button
+        className="icon-btn cart-close"
+        aria-label="Cerrar cuenta"
+        onClick={() => setCartOpen(false)}
+      >
+        <span className="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  );
 
   return (
     <div className="pos">
@@ -174,11 +194,7 @@ export default function POS() {
 
         <div className="product-grid">
           {visibles.map((p) => (
-            <div
-              key={p.id}
-              className="product-card"
-              onClick={() => abrir(p)}
-            >
+            <div key={p.id} className="product-card" onClick={() => abrir(p)}>
               <div className="product-thumb">
                 {p.imagen ? (
                   <img src={p.imagen} alt={p.nombre} />
@@ -196,8 +212,8 @@ export default function POS() {
         </div>
       </div>
 
-      <div className="card">
-        <h3>Cuenta</h3>
+      <div className={cartOpen ? "card cart open" : "card cart"}>
+        {cartHead}
         {cart.length === 0 ? (
           <p className="muted">Agrega productos.</p>
         ) : (
@@ -261,8 +277,8 @@ export default function POS() {
         <div className="payment">
           <select value={metodo} onChange={(e) => setMetodo(e.target.value)}>
             <option value="efectivo">Efectivo</option>
-            <option value="tarjeta">Tarjeta</option>
             <option value="transferencia">Transferencia</option>
+            <option value="tarjeta">Tarjeta</option>
           </select>
           <MoneyInput
             placeholder="Monto (opcional)"
@@ -279,6 +295,13 @@ export default function POS() {
         </div>
         {mensaje && <p className="ok">{mensaje}</p>}
         {error && <p className="error">{error}</p>}
+      </div>
+
+      <div className={cart.length === 0 ? "pos-bar hidden" : "pos-bar"}>
+        <span className="pos-total">{formatMoney(total)}</span>
+        <button onClick={() => setCartOpen((o) => !o)}>
+          {cartOpen ? "Cerrar cuenta" : "Ver cuenta"}
+        </button>
       </div>
 
       {modal && (

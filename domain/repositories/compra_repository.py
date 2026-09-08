@@ -24,3 +24,7 @@ class CompraRepository(ABC):
     @abstractmethod
     def has_for_proveedor(self, proveedor_id: str) -> bool:
         ...
+
+    @abstractmethod
+    def delete(self, id: str) -> None:
+        ...

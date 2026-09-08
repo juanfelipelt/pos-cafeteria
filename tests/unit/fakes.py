@@ -77,6 +77,9 @@ class FakeCompraRepository(CompraRepository):
     def has_for_proveedor(self, proveedor_id: str):
         return any(c.proveedor_id == proveedor_id for c in self.data.values())
 
+    def delete(self, id: str):
+        self.data.pop(id, None)
+
 
 class FakeUsuarioRepository(UsuarioRepository):
     def __init__(self) -> None:

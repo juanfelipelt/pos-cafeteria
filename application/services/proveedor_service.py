@@ -25,6 +25,8 @@ class ProveedorService:
         telefono: str,
         email: str = "",
         direccion: str = "",
+        tipo_identificacion: str = "",
+        identificacion: str = "",
     ) -> Proveedor:
         proveedor = Proveedor(
             id=new_id(),
@@ -33,6 +35,8 @@ class ProveedorService:
             telefono=telefono,
             email=email,
             direccion=direccion,
+            tipo_identificacion=tipo_identificacion,
+            identificacion=identificacion,
         )
         self.proveedores.add(proveedor)
         self.session.commit()
@@ -57,6 +61,8 @@ class ProveedorService:
         telefono: str | None = None,
         email: str | None = None,
         direccion: str | None = None,
+        tipo_identificacion: str | None = None,
+        identificacion: str | None = None,
     ) -> Proveedor:
         proveedor = self.obtener(proveedor_id)
         if nombre is not None:
@@ -69,6 +75,10 @@ class ProveedorService:
             proveedor.cambiar_email(email)
         if direccion is not None:
             proveedor.cambiar_direccion(direccion)
+        if tipo_identificacion is not None:
+            proveedor.cambiar_tipo_identificacion(tipo_identificacion)
+        if identificacion is not None:
+            proveedor.cambiar_identificacion(identificacion)
         self.proveedores.update(proveedor)
         self.session.commit()
         return proveedor

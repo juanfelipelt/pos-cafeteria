@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../auth";
 
+const TIPOS_IDENTIFICACION = [
+  "CC",
+  "NIT",
+  "CE",
+  "TI",
+  "PPT",
+  "PASAPORTE",
+  "OTRO",
+];
+
 interface Proveedor {
   id: string;
   nombre: string;
@@ -9,6 +19,8 @@ interface Proveedor {
   telefono: string;
   email: string;
   direccion: string;
+  tipo_identificacion: string;
+  identificacion: string;
   estado: boolean;
 }
 
@@ -19,6 +31,8 @@ interface Editando {
   telefono: string;
   email: string;
   direccion: string;
+  tipo_identificacion: string;
+  identificacion: string;
 }
 
 export default function Proveedores() {
@@ -27,6 +41,9 @@ export default function Proveedores() {
   const [nombre, setNombre] = useState("");
   const [contacto, setContacto] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [email, setEmail] = useState("");
+  const [tipoId, setTipoId] = useState("");
+  const [identificacion, setIdentificacion] = useState("");
   const [editando, setEditando] = useState<Editando | null>(null);
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
@@ -46,11 +63,21 @@ export default function Proveedores() {
     try {
       await api("/proveedores", {
         method: "POST",
-        body: JSON.stringify({ nombre, contacto, telefono }),
+        body: JSON.stringify({
+          nombre,
+          contacto,
+          telefono,
+          email,
+          tipo_identificacion: tipoId,
+          identificacion,
+        }),
       });
       setNombre("");
       setContacto("");
       setTelefono("");
+      setEmail("");
+      setTipoId("");
+      setIdentificacion("");
       setOk("Proveedor creado.");
       await cargar();
     } catch (err) {
@@ -70,6 +97,8 @@ export default function Proveedores() {
           telefono: editando.telefono,
           email: editando.email,
           direccion: editando.direccion,
+          tipo_identificacion: editando.tipo_identificacion,
+          identificacion: editando.identificacion,
         }),
       });
       setEditando(null);
@@ -98,40 +127,69 @@ export default function Proveedores() {
     }
   }
 
+  const ident = (p: Proveedor) =>
+    p.identificacion ? `${p.tipo_identificacion || "—"} ${p.identificacion}` : "—";
+
   return (
     <div>
       <h2>Proveedores</h2>
 
-      <form onSubmit={crear} className="card inline-form">
-        <input
-          placeholder="Nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Contacto"
-          value={contacto}
-          onChange={(e) => setContacto(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Teléfono"
-          value={telefono}
-          onChange={(e) => setTelefono(e.target.value)}
-          required
-        />
-        <button type="submit" className="primary">
-          Agregar
-        </button>
+      {error && <p className="error">{error}</p>}
+
+      <form onSubmit={crear} className="card">
+        <h3>Nuevo proveedor</h3>
+        <div className="inline-form">
+          <select value={tipoId} onChange={(e) => setTipoId(e.target.value)}>
+            <option value="" disabled>
+              Tipo identificación
+            </option>
+            {TIPOS_IDENTIFICACION.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <input
+            placeholder="N° identificación"
+            value={identificacion}
+            onChange={(e) => setIdentificacion(e.target.value)}
+          />
+          <input
+            placeholder="Nombre"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            required
+          />
+          <input
+            placeholder="Contacto"
+            value={contacto}
+            onChange={(e) => setContacto(e.target.value)}
+            required
+          />
+          <input
+            placeholder="Teléfono"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            required
+          />
+          <input
+            placeholder="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <button type="submit" className="primary">
+            Agregar
+          </button>
+        </div>
         {ok && <p className="ok">{ok}</p>}
-        {error && <p className="error">{error}</p>}
       </form>
 
       <table>
         <thead>
           <tr>
             <th>Nombre</th>
+            <th>Identificación</th>
             <th>Contacto</th>
             <th>Teléfono</th>
             <th>Email</th>
@@ -142,47 +200,52 @@ export default function Proveedores() {
         <tbody>
           {proveedores.map((p) => (
             <tr key={p.id}>
-              <td>{p.nombre}</td>
-              <td>{p.contacto}</td>
-              <td>{p.telefono}</td>
-              <td>{p.email || "—"}</td>
-              <td>
+              <td data-label="Nombre" className="cell-main">
+                {p.nombre}
+              </td>
+              <td data-label="Identificación">{ident(p)}</td>
+              <td data-label="Contacto">{p.contacto}</td>
+              <td data-label="Teléfono">{p.telefono}</td>
+              <td data-label="Email">{p.email || "—"}</td>
+              <td data-label="Estado">
                 <span className={p.estado ? "pill on" : "pill off"}>
                   {p.estado ? "Activo" : "Inactivo"}
                 </span>
               </td>
-              <td>
-                <button
-                  className="ghost"
-                  onClick={() =>
-                    setEditando({
-                      id: p.id,
-                      nombre: p.nombre,
-                      contacto: p.contacto,
-                      telefono: p.telefono,
-                      email: p.email,
-                      direccion: p.direccion,
-                    })
-                  }
-                >
-                  Editar
-                </button>
-                <button
-                  className="ghost"
-                  style={{ marginLeft: 6 }}
-                  onClick={() => cambiarEstado(p)}
-                >
-                  {p.estado ? "Desactivar" : "Activar"}
-                </button>
-                {user?.rol === "admin" && (
+              <td className="no-label">
+                <div className="actions">
                   <button
                     className="ghost"
-                    style={{ marginLeft: 6 }}
-                    onClick={() => eliminar(p.id)}
+                    onClick={() =>
+                      setEditando({
+                        id: p.id,
+                        nombre: p.nombre,
+                        contacto: p.contacto,
+                        telefono: p.telefono,
+                        email: p.email,
+                        direccion: p.direccion,
+                        tipo_identificacion: p.tipo_identificacion,
+                        identificacion: p.identificacion,
+                      })
+                    }
                   >
-                    Eliminar
+                    Editar
                   </button>
-                )}
+                  <button
+                    className="ghost"
+                    onClick={() => cambiarEstado(p)}
+                  >
+                    {p.estado ? "Desactivar" : "Activar"}
+                  </button>
+                  {user?.rol === "admin" && (
+                    <button
+                      className="ghost danger"
+                      onClick={() => eliminar(p.id)}
+                    >
+                      Eliminar
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
@@ -194,6 +257,28 @@ export default function Proveedores() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>Editar proveedor</h3>
             <div className="inline-form" style={{ flexDirection: "column", alignItems: "stretch" }}>
+              <select
+                value={editando.tipo_identificacion}
+                onChange={(e) =>
+                  setEditando({ ...editando, tipo_identificacion: e.target.value })
+                }
+              >
+                <option value="" disabled>
+                  Tipo identificación
+                </option>
+                {TIPOS_IDENTIFICACION.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+              <input
+                placeholder="N° identificación"
+                value={editando.identificacion}
+                onChange={(e) =>
+                  setEditando({ ...editando, identificacion: e.target.value })
+                }
+              />
               <input
                 placeholder="Nombre"
                 value={editando.nombre}

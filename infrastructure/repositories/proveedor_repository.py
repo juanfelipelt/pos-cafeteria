@@ -13,6 +13,8 @@ def _to_entity(m: ProveedorModel) -> Proveedor:
         telefono=m.telefono,
         email=m.email,
         direccion=m.direccion,
+        tipo_identificacion=m.tipo_identificacion,
+        identificacion=m.identificacion,
         estado=m.estado,
     )
 
@@ -43,6 +45,8 @@ class SQLAlchemyProveedorRepository(ProveedorRepository):
             telefono=proveedor.telefono,
             email=proveedor.email,
             direccion=proveedor.direccion,
+            tipo_identificacion=proveedor.tipo_identificacion,
+            identificacion=proveedor.identificacion,
             estado=proveedor.estado,
         )
         self.session.add(m)
@@ -56,6 +60,8 @@ class SQLAlchemyProveedorRepository(ProveedorRepository):
         m.telefono = proveedor.telefono
         m.email = proveedor.email
         m.direccion = proveedor.direccion
+        m.tipo_identificacion = proveedor.tipo_identificacion
+        m.identificacion = proveedor.identificacion
         m.estado = proveedor.estado
         self.session.flush()
         return proveedor

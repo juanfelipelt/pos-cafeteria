@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from application.schemas.auth import LoginRequest, RegistrarRequest
+from application.security.rate_limit import login_limiter
 from application.services.auth_service import AuthService
 from database import get_session
 from domain.entities.usuario import Usuario
@@ -13,10 +14,18 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login")
 def login(body: LoginRequest, db: Session = Depends(get_session)):
+    email = body.email.strip().lower()
+    if not login_limiter.allow(email):
+        raise HTTPException(
+            status_code=429, detail="Demasiados intentos. Intenta de nuevo más tarde."
+        )
+
     token = AuthService(SQLAlchemyUsuarioRepository(db), db).login(
         body.email, body.password
     )
-    usuario = SQLAlchemyUsuarioRepository(db).get_by_email(body.email)
+    login_limiter.reset(email)
+
+    usuario = SQLAlchemyUsuarioRepository(db).get_by_email(email)
     return {
         "access_token": token,
         "token_type": "bearer",

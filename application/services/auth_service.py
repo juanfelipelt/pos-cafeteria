@@ -5,7 +5,7 @@ from application.security.jwt import create_access_token
 from application.utils import new_id
 from domain.entities.enums import Rol
 from domain.entities.usuario import Usuario
-from domain.exceptions import ConflictError, UnauthorizedError
+from domain.exceptions import ConflictError, UnauthorizedError, ValidationError
 from domain.repositories.usuario_repository import UsuarioRepository
 
 
@@ -15,7 +15,7 @@ class AuthService:
         self.session = session
 
     def login(self, email: str, password: str) -> str:
-        usuario = self.usuarios.get_by_email(email)
+        usuario = self.usuarios.get_by_email(email.strip().lower())
         if usuario is None or not usuario.estado:
             raise UnauthorizedError("Credenciales inválidas.")
         if not verify_password(password, usuario.contraseña_hash):
@@ -25,12 +25,15 @@ class AuthService:
     def registrar(
         self, nombre: str, email: str, password: str, rol: Rol = Rol.CAJERO
     ) -> Usuario:
-        if self.usuarios.get_by_email(email) is not None:
+        email_norm = email.strip().lower()
+        if len(password) < 8:
+            raise ValidationError("La contraseña debe tener al menos 8 caracteres.")
+        if self.usuarios.get_by_email(email_norm) is not None:
             raise ConflictError("Ya existe un usuario con ese email.")
         usuario = Usuario(
             id=new_id(),
             nombre=nombre,
-            email=email,
+            email=email_norm,
             contraseña_hash=hash_password(password),
             rol=rol,
         )

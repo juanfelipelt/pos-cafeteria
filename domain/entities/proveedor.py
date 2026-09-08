@@ -11,6 +11,8 @@ class Proveedor:
     telefono: str = ""
     email: str = ""
     direccion: str = ""
+    tipo_identificacion: str = ""
+    identificacion: str = ""
     estado: bool = True
 
     def __post_init__(self) -> None:
@@ -19,6 +21,10 @@ class Proveedor:
         self.telefono = self.telefono.strip() if self.telefono else ""
         self.email = self.email.strip() if self.email else ""
         self.direccion = self.direccion.strip() if self.direccion else ""
+        self.tipo_identificacion = (
+            self.tipo_identificacion.strip() if self.tipo_identificacion else ""
+        )
+        self.identificacion = self.identificacion.strip() if self.identificacion else ""
 
         if not self.nombre:
             raise ValueError("El nombre del proveedor es obligatorio.")
@@ -48,6 +54,12 @@ class Proveedor:
     def cambiar_direccion(self, nueva_direccion: str) -> None:
         self.direccion = nueva_direccion.strip() if nueva_direccion else ""
 
+    def cambiar_tipo_identificacion(self, nuevo_tipo: str) -> None:
+        self.tipo_identificacion = nuevo_tipo.strip() if nuevo_tipo else ""
+
+    def cambiar_identificacion(self, nueva_identificacion: str) -> None:
+        self.identificacion = nueva_identificacion.strip() if nueva_identificacion else ""
+
     def desactivar(self) -> None:
         self.estado = False
 
@@ -62,5 +74,7 @@ class Proveedor:
             "telefono": self.telefono,
             "email": self.email,
             "direccion": self.direccion,
+            "tipo_identificacion": self.tipo_identificacion,
+            "identificacion": self.identificacion,
             "estado": self.estado,
         }

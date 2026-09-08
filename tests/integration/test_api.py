@@ -35,7 +35,7 @@ class TestAuth:
             json={
                 "nombre": "X",
                 "email": "x@x.com",
-                "password": "x",
+                "password": "password123",
                 "rol": "cajero",
             },
             headers=cajero_headers,
@@ -161,6 +161,27 @@ class TestCompras:
         assert r.json()["total"] == 8.0
         stock = client.get(f"/productos/{p['id']}", headers=admin_headers).json()["stock"]
         assert stock == 10
+
+    def test_eliminar_compra(self, client, admin_headers):
+        p = _create_producto(client, admin_headers, stock=2)
+        r = client.post(
+            "/compras",
+            json={
+                "proveedor_id": "prov1",
+                "items": [{"producto_id": p["id"], "cantidad": 8, "precio_unitario": 1.0}],
+            },
+            headers=admin_headers,
+        )
+        compra_id = r.json()["id"]
+
+        r = client.delete(f"/compras/{compra_id}", headers=admin_headers)
+        assert r.status_code == 200
+
+        stock = client.get(f"/productos/{p['id']}", headers=admin_headers).json()["stock"]
+        assert stock == 2
+
+        r = client.get(f"/compras/{compra_id}", headers=admin_headers)
+        assert r.status_code == 404
 
 
 class TestReportes:

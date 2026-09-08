@@ -124,32 +124,33 @@ export default function Ventas() {
                 className="venta-row"
                 onClick={() => setAbierta(abierta === v.id ? null : v.id)}
               >
-                <td>{fecha(v)}</td>
-                <td>{formatMoney(v.total)}</td>
-                <td>
+                <td data-label="Fecha">{fecha(v)}</td>
+                <td data-label="Total">{formatMoney(v.total)}</td>
+                <td data-label="Estado">
                   <span className={`pill ${estado(v).clase}`}>
                     {estado(v).label}
                   </span>
                 </td>
                 {user?.rol === "admin" && (
-                  <td onClick={(e) => e.stopPropagation()}>
-                    {!v.anulada && (
-                      <button className="ghost" onClick={() => anular(v.id)}>
-                        Anular
+                  <td className="no-label" onClick={(e) => e.stopPropagation()}>
+                    <div className="actions">
+                      {!v.anulada && (
+                        <button className="ghost" onClick={() => anular(v.id)}>
+                          Anular
+                        </button>
+                      )}
+                      <button
+                        className="ghost danger"
+                        onClick={() => eliminar(v.id)}
+                      >
+                        Eliminar
                       </button>
-                    )}
-                    <button
-                      className="ghost"
-                      style={{ marginLeft: 8 }}
-                      onClick={() => eliminar(v.id)}
-                    >
-                      Eliminar
-                    </button>
+                    </div>
                   </td>
                 )}
               </tr>
               {abierta === v.id && (
-                <tr>
+                <tr className="detalle-row">
                   <td colSpan={user?.rol === "admin" ? 4 : 3}>
                     <div className="detail-panel">
                       {v.detalles.map((d) => (

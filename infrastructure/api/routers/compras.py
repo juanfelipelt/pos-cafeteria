@@ -65,3 +65,13 @@ def anular(
     db: Session = Depends(get_session),
 ):
     return _build_service(db).anular(compra_id).to_dict()
+
+
+@router.delete("/{compra_id}")
+def eliminar(
+    compra_id: str,
+    _: Usuario = Depends(require_admin),
+    db: Session = Depends(get_session),
+):
+    _build_service(db).eliminar(compra_id)
+    return {"detail": "Compra eliminada."}

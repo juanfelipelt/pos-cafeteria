@@ -274,7 +274,7 @@ export default function Productos() {
         <tbody>
           {productos.map((p) => (
             <tr key={p.id}>
-              <td>
+              <td className="no-label">
                 <span className="cart-thumb">
                   {p.imagen ? (
                     <img src={p.imagen} alt={p.nombre} />
@@ -283,38 +283,41 @@ export default function Productos() {
                   )}
                 </span>
               </td>
-              <td>{p.nombre}</td>
-              <td>{categoriaDe(p.categoria_id)}</td>
-              <td>{formatMoney(p.precio)}</td>
-              <td>{p.stock}</td>
-              <td>
+              <td data-label="Nombre" className="cell-main">
+                {p.nombre}
+              </td>
+              <td data-label="Categoría">{categoriaDe(p.categoria_id)}</td>
+              <td data-label="Precio">{formatMoney(p.precio)}</td>
+              <td data-label="Stock">{p.stock}</td>
+              <td data-label="Estado">
                 <span className={p.estado ? "pill on" : "pill off"}>
                   {p.estado ? "Activo" : "Inactivo"}
                 </span>
               </td>
-              <td>
-                <button
-                  className="ghost"
-                  onClick={() =>
-                    setEditando({
-                      id: p.id,
-                      nombre: p.nombre,
-                      precio: p.precio,
-                      stock: p.stock,
-                      categoria_id: p.categoria_id ?? "",
-                      imagen: p.imagen,
-                    })
-                  }
-                >
-                  Editar
-                </button>
-                <button
-                  className="ghost"
-                  style={{ marginLeft: 6 }}
-                  onClick={() => cambiarEstado(p)}
-                >
-                  {p.estado ? "Desactivar" : "Activar"}
-                </button>
+              <td className="no-label">
+                <div className="actions">
+                  <button
+                    className="ghost"
+                    onClick={() =>
+                      setEditando({
+                        id: p.id,
+                        nombre: p.nombre,
+                        precio: p.precio,
+                        stock: p.stock,
+                        categoria_id: p.categoria_id ?? "",
+                        imagen: p.imagen,
+                      })
+                    }
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="ghost"
+                    onClick={() => cambiarEstado(p)}
+                  >
+                    {p.estado ? "Desactivar" : "Activar"}
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

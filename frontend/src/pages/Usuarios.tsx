@@ -98,12 +98,14 @@ export default function Usuarios() {
         <tbody>
           {usuarios.map((u) => (
             <tr key={u.id}>
-              <td>{u.nombre}</td>
-              <td>{u.email}</td>
-              <td>
+              <td data-label="Nombre" className="cell-main">
+                {u.nombre}
+              </td>
+              <td data-label="Email">{u.email}</td>
+              <td data-label="Rol">
                 {u.rol === "admin" ? "Administrador" : "Cajero"}
               </td>
-              <td>
+              <td data-label="Estado">
                 <span className={u.estado ? "pill on" : "pill off"}>
                   {u.estado ? "Activo" : "Inactivo"}
                 </span>

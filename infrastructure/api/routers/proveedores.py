@@ -38,7 +38,13 @@ def crear(
     _=Depends(get_current_user),
 ):
     return _build_service(db).crear(
-        body.nombre, body.contacto, body.telefono, body.email, body.direccion
+        body.nombre,
+        body.contacto,
+        body.telefono,
+        body.email,
+        body.direccion,
+        body.tipo_identificacion,
+        body.identificacion,
     ).to_dict()
 
 
@@ -65,6 +71,8 @@ def actualizar(
         body.telefono,
         body.email,
         body.direccion,
+        body.tipo_identificacion,
+        body.identificacion,
     ).to_dict()
 
 

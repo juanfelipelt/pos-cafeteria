@@ -7,6 +7,8 @@ class ProveedorCreate(BaseModel):
     telefono: str
     email: str = ""
     direccion: str = ""
+    tipo_identificacion: str = ""
+    identificacion: str = ""
 
 
 class ProveedorUpdate(BaseModel):
@@ -15,3 +17,5 @@ class ProveedorUpdate(BaseModel):
     telefono: str | None = None
     email: str | None = None
     direccion: str | None = None
+    tipo_identificacion: str | None = None
+    identificacion: str | None = None

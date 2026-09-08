@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from domain.entities.enums import Rol
 
@@ -11,5 +11,5 @@ class LoginRequest(BaseModel):
 class RegistrarRequest(BaseModel):
     nombre: str
     email: str
-    password: str
+    password: str = Field(min_length=8)
     rol: Rol = Rol.CAJERO

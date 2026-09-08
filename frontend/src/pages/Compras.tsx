@@ -113,8 +113,24 @@ export default function Compras() {
 
   async function anular(id: string) {
     if (!window.confirm("¿Anular esta compra? Se descontará el stock.")) return;
-    await api(`/compras/${id}/anular`, { method: "POST" });
-    await cargar();
+    setError("");
+    try {
+      await api(`/compras/${id}/anular`, { method: "POST" });
+      await cargar();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error");
+    }
+  }
+
+  async function eliminar(id: string) {
+    if (!window.confirm("¿Estás seguro de eliminar esta compra? Se descontará el stock.")) return;
+    setError("");
+    try {
+      await api(`/compras/${id}`, { method: "DELETE" });
+      await cargar();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error");
+    }
   }
 
   const total = items.reduce((s, i) => s + i.cantidad * i.precio_unitario, 0);
@@ -124,6 +140,8 @@ export default function Compras() {
   return (
     <div>
       <h2>Compras</h2>
+
+      {error && <p className="error">{error}</p>}
 
       <section className="card">
         <h3>Registrar compra</h3>
@@ -183,10 +201,14 @@ export default function Compras() {
             <tbody>
               {items.map((i, idx) => (
                 <tr key={idx}>
-                  <td>{i.nombre}</td>
-                  <td>{i.cantidad}</td>
-                  <td>{formatMoney(i.precio_unitario)}</td>
-                  <td>{formatMoney(i.cantidad * i.precio_unitario)}</td>
+                  <td data-label="Producto" className="cell-main">
+                    {i.nombre}
+                  </td>
+                  <td data-label="Cant.">{i.cantidad}</td>
+                  <td data-label="Costo">{formatMoney(i.precio_unitario)}</td>
+                  <td data-label="Subtotal">
+                    {formatMoney(i.cantidad * i.precio_unitario)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -221,40 +243,48 @@ export default function Compras() {
           <tbody>
             {compras.map((c) => (
               <Fragment key={c.id}>
-                <tr
-                  className="venta-row"
-                  onClick={() => setAbierta(abierta === c.id ? null : c.id)}
-                >
-                  <td>
-                    {new Date(c.fecha).toLocaleString("es-ES", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </td>
-                  <td>{nombreProveedor(c.proveedor_id)}</td>
-                  <td>{formatMoney(c.total)}</td>
-                  <td>
-                    <span className={c.anulada ? "pill off" : "pill on"}>
-                      {c.anulada ? "Anulada" : "Registrada"}
-                    </span>
-                  </td>
-                  {user?.rol === "admin" && (
-                    <td onClick={(e) => e.stopPropagation()}>
+              <tr
+                className="venta-row"
+                onClick={() => setAbierta(abierta === c.id ? null : c.id)}
+              >
+                <td data-label="Fecha">
+                  {new Date(c.fecha).toLocaleString("es-ES", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </td>
+                <td data-label="Proveedor">{nombreProveedor(c.proveedor_id)}</td>
+                <td data-label="Total">{formatMoney(c.total)}</td>
+                <td data-label="Estado">
+                  <span className={c.anulada ? "pill off" : "pill on"}>
+                    {c.anulada ? "Anulada" : "Registrada"}
+                  </span>
+                </td>
+                {user?.rol === "admin" && (
+                  <td className="no-label" onClick={(e) => e.stopPropagation()}>
+                    <div className="actions">
                       {!c.anulada && (
                         <button className="ghost" onClick={() => anular(c.id)}>
                           Anular
                         </button>
                       )}
-                    </td>
-                  )}
-                </tr>
-                {abierta === c.id && (
-                  <tr>
-                    <td colSpan={user?.rol === "admin" ? 5 : 4}>
-                      <div className="detail-panel">
+                      <button
+                        className="ghost danger"
+                        onClick={() => eliminar(c.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+              {abierta === c.id && (
+                <tr className="detalle-row">
+                  <td colSpan={user?.rol === "admin" ? 5 : 4}>
+                    <div className="detail-panel">
                         {c.detalles.map((d) => (
                           <div
                             key={d.id}

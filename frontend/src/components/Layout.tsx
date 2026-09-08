@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useConfig } from "../config";
@@ -13,6 +14,11 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const { logo } = useConfig();
   const location = useLocation();
+  const [abierto, setAbierto] = useState(false);
+
+  useEffect(() => {
+    setAbierto(false);
+  }, [location.pathname]);
 
   const links: NavItem[] = [
     { to: "/", label: "Dashboard", icon: "space_dashboard", end: true },
@@ -30,7 +36,7 @@ export default function Layout() {
 
   return (
     <div className="app">
-      <aside className="sidebar">
+      <aside className={abierto ? "sidebar open" : "sidebar"}>
         <div className="sidebar-brand">
           {logo ? (
             <img className="logo" src={logo} alt="Logo" />
@@ -64,7 +70,28 @@ export default function Layout() {
         </div>
       </aside>
 
+      {abierto && <div className="backdrop" onClick={() => setAbierto(false)} />}
+
       <main className="main">
+        <header className="topbar-mobile">
+          <button
+            className="icon-btn"
+            aria-label="Abrir menú"
+            onClick={() => setAbierto(true)}
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+          <span className="topbar-title">
+            {logo ? (
+              <img className="logo" src={logo} alt="Logo" />
+            ) : (
+              <span className="logo-placeholder">B</span>
+            )}
+            Cafetería POS
+          </span>
+          <span className="topbar-user">{user?.nombre?.split(" ")[0]}</span>
+        </header>
+
         <div className="page" key={location.pathname}>
           <Outlet />
         </div>

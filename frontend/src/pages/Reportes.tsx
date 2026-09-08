@@ -113,9 +113,11 @@ export default function Reportes() {
               <tbody>
                 {data.map((d) => (
                   <tr key={d.periodo}>
-                    <td>{d.periodo}</td>
-                    <td>{d.num_ventas}</td>
-                    <td>{formatMoney(d.total)}</td>
+                    <td data-label="Periodo" className="cell-main">
+                      {d.periodo}
+                    </td>
+                    <td data-label="Ventas">{d.num_ventas}</td>
+                    <td data-label="Total">{formatMoney(d.total)}</td>
                   </tr>
                 ))}
               </tbody>

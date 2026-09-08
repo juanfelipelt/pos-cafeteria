@@ -82,3 +82,9 @@ class SQLAlchemyCompraRepository(CompraRepository):
             .first()
             is not None
         )
+
+    def delete(self, id: str) -> None:
+        m = self.session.get(CompraModel, id)
+        if m is not None:
+            self.session.delete(m)
+            self.session.flush()

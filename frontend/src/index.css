@@ -779,6 +779,23 @@ tbody tr:hover {
   font-size: 14px;
 }
 
+/* ---------- Danger button ---------- */
+button.danger:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+/* ---------- Loading screen ---------- */
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  font-size: 15px;
+}
+
 /* ---------- File label (input de imagen) ---------- */
 .file-label {
   display: inline-flex;
@@ -800,4 +817,407 @@ tbody tr:hover {
 .file-label .material-symbols-outlined {
   font-size: 18px;
   color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   RESPONSIVE (tablet / móvil)
+   ========================================================================== */
+
+/* ---------- Desktop por defecto: ocultar elementos móviles ---------- */
+.topbar-mobile,
+.backdrop,
+.pos-bar {
+  display: none;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: var(--hover);
+}
+
+.cart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cart-head h3 {
+  margin: 0;
+}
+
+.cart-close {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  /* ---------- Topbar móvil ---------- */
+  .topbar-mobile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 14px;
+    height: 52px;
+  }
+
+  .topbar-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .topbar-user {
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  /* ---------- Sidebar como drawer ---------- */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  /* ---------- Main ---------- */
+  .main {
+    padding: 16px 16px 96px;
+    min-width: 0;
+  }
+
+  .page {
+    max-width: 100%;
+    margin-top: 18px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  /* ---------- Grids a una columna ---------- */
+  .grid,
+  .cards {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .pos {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .pos .card.cart {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    margin: 0;
+    max-height: 82vh;
+    overflow: auto;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.14);
+    transform: translateY(105%);
+    transition: transform 0.24s ease;
+  }
+
+  .pos .card.cart.open {
+    transform: translateY(0);
+  }
+
+  .pos-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 44;
+    background: var(--accent);
+    color: #fff;
+    padding: 12px 16px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.12);
+  }
+
+  .cart-close {
+    display: inline-flex;
+  }
+
+  .pos-bar.hidden {
+    display: none;
+  }
+
+  .pos-bar .pos-total {
+    flex: 1;
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .pos-bar button {
+    background: #fff;
+    color: var(--accent);
+  }
+
+  /* ---------- Tablas -> tarjetas apiladas ---------- */
+  table {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody {
+    display: block;
+  }
+
+  tbody tr {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px 0;
+    margin-bottom: 10px;
+  }
+
+  tbody tr:hover {
+    background: #fff;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    text-align: right;
+  }
+
+  tbody tr:last-child td:last-child,
+  td:last-child {
+    border-bottom: none;
+  }
+
+  td::before {
+    content: attr(data-label);
+    color: var(--text-faint);
+    font-size: 12px;
+    text-align: left;
+  }
+
+  td.no-label {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  td.no-label::before {
+    content: none;
+  }
+
+  td.no-label .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  /* fila de detalle (ventas/compras expandidas) */
+  tr.detalle-row {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: -6px 0 12px;
+  }
+
+  tr.detalle-row td {
+    display: block;
+    background: transparent;
+    padding: 0 12px;
+  }
+
+  tr.detalle-row td::before {
+    content: none;
+  }
+
+  tr.detalle-row td .detail-panel {
+    margin: 0;
+  }
+
+  /* ---------- Formularios a ancho completo ---------- */
+  .inline-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inline-form > input,
+  .inline-form > select,
+  .inline-form > .file-label,
+  .inline-form label,
+  .inline-form button,
+  .payment input,
+  .payment select {
+    width: 100%;
+  }
+
+  .payment {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .product-list {
+    max-height: none;
+  }
+
+  /* el carrito del POS conserva su tabla normal dentro del sheet */
+  .pos .cart table {
+    display: table;
+    width: 100%;
+  }
+
+  .pos .cart thead {
+    display: table-header-group;
+  }
+
+  .pos .cart tbody {
+    display: table-row-group;
+  }
+
+  .pos .cart tbody tr {
+    display: table-row;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .pos .cart td {
+    display: table-cell;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .pos .cart td::before {
+    content: none;
+  }
+
+  .pos .cart td.no-label {
+    justify-content: initial;
+  }
+
+  td.cell-main {
+    font-weight: 600;
+  }
+
+  td.cell-main::before {
+    content: none;
+  }
+
+  /* ---------- Chips scroll horizontal ---------- */
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .chip {
+    flex-shrink: 0;
+  }
+
+  /* ---------- Login ---------- */
+  .login {
+    padding: 20px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100vw;
+    border-radius: 14px 14px 0 0;
+    padding: 20px;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 12px 12px 96px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .product-info {
+    padding: 8px 10px;
+  }
+
+  .product-info .name {
+    font-size: 13px;
+  }
+
+  .product-thumb .material-symbols-outlined {
+    font-size: 32px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .logo-editor {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .pos-total {
+    font-size: 16px;
+  }
 }

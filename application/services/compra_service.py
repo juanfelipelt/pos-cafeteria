@@ -75,3 +75,21 @@ class CompraService:
         self.compras.update(compra)
         self.session.commit()
         return compra
+
+    def eliminar(self, compra_id: str) -> None:
+        compra = self.obtener(compra_id)
+
+        if not compra.anulada:
+            for detalle in compra.detalles:
+                producto = self.productos.get(detalle.producto_id)
+                if producto is not None:
+                    if producto.stock < detalle.cantidad:
+                        raise ValidationError(
+                            f"No se puede eliminar: stock insuficiente de "
+                            f"'{producto.nombre}'."
+                        )
+                    producto.stock -= detalle.cantidad
+                    self.productos.update(producto)
+
+        self.compras.delete(compra.id)
+        self.session.commit()
