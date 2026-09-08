@@ -306,3 +306,58 @@ class TestConfiguracion:
 
         r = client.get("/configuracion")
         assert r.json()["logo"] == "data:image/png;base64,AAAA"
+
+
+class TestPermisosCajero:
+    def test_no_crea_productos(self, client, admin_headers, cajero_headers):
+        r = client.post(
+            "/productos", json={"nombre": "X", "precio": 1, "stock": 1}, headers=cajero_headers
+        )
+        assert r.status_code == 403
+
+    def test_no_edita_estado_producto(self, client, admin_headers, cajero_headers):
+        p = _create_producto(client, admin_headers)
+        r = client.patch(
+            f"/productos/{p['id']}/estado", json={"estado": False}, headers=cajero_headers
+        )
+        assert r.status_code == 403
+
+    def test_no_crea_categorias(self, client, cajero_headers):
+        r = client.post("/categorias", json={"nombre": "X"}, headers=cajero_headers)
+        assert r.status_code == 403
+
+    def test_no_crea_proveedores(self, client, cajero_headers):
+        r = client.post(
+            "/proveedores",
+            json={"nombre": "A", "contacto": "C", "telefono": "T"},
+            headers=cajero_headers,
+        )
+        assert r.status_code == 403
+
+    def test_no_edita_proveedor(self, client, admin_headers, cajero_headers):
+        r = client.post(
+            "/proveedores",
+            json={"nombre": "A", "contacto": "C", "telefono": "T"},
+            headers=admin_headers,
+        )
+        pid = r.json()["id"]
+        r = client.put(
+            f"/proveedores/{pid}", json={"nombre": "B"}, headers=cajero_headers
+        )
+        assert r.status_code == 403
+
+    def test_no_genera_reportes(self, client, cajero_headers):
+        r = client.get(
+            "/reportes/ventas?desde=2000-01-01T00:00:00&hasta=2100-01-01T00:00:00&agrupacion=dia",
+            headers=cajero_headers,
+        )
+        assert r.status_code == 403
+
+    def test_si_crea_venta(self, client, admin_headers, cajero_headers):
+        p = _create_producto(client, admin_headers)
+        r = client.post(
+            "/ventas",
+            json={"items": [{"producto_id": p["id"], "cantidad": 1}], "pagos": []},
+            headers=cajero_headers,
+        )
+        assert r.status_code == 200

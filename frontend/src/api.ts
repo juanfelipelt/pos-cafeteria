@@ -1,5 +1,20 @@
 const BASE: string = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
+function preconnectApi(): void {
+  try {
+    const origin = new URL(BASE).origin;
+    if (!origin || typeof document === "undefined") return;
+    const link = document.createElement("link");
+    link.rel = "preconnect";
+    link.href = origin;
+    link.crossOrigin = "anonymous";
+    document.head.appendChild(link);
+  } catch {
+    /* URL inválida: se ignora */
+  }
+}
+preconnectApi();
+
 export function getToken(): string | null {
   return localStorage.getItem("token");
 }
@@ -43,7 +58,20 @@ export async function api<T = unknown>(
     let detail = res.statusText;
     try {
       const data = await res.json();
-      if (data.detail) detail = data.detail;
+      if (typeof data.detail === "string") {
+        detail = data.detail;
+      } else if (Array.isArray(data.detail)) {
+        detail = data.detail
+          .map((d: { msg?: string; loc?: unknown[] }) =>
+            typeof d?.msg === "string"
+              ? `${(d.loc?.slice(1) || []).join(".")}: ${d.msg}`
+              : String(d)
+          )
+          .filter(Boolean)
+          .join(" · ");
+      } else if (data.detail) {
+        detail = JSON.stringify(data.detail);
+      }
     } catch {
       /* noop */
     }

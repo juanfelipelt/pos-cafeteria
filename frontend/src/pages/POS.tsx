@@ -33,7 +33,7 @@ export default function POS() {
 
   const [cart, setCart] = useState<Item[]>([]);
   const [metodo, setMetodo] = useState("efectivo");
-  const [monto, setMonto] = useState(0);
+  const [recibido, setRecibido] = useState(0);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
 
@@ -67,6 +67,13 @@ export default function POS() {
     () => cart.reduce((s, i) => s + i.precio * i.cantidad, 0),
     [cart]
   );
+
+  useEffect(() => {
+    if (metodo === "efectivo" && cart.length > 0 && recibido === 0) {
+      setRecibido(total);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total, metodo]);
 
   const stockDe = (producto_id: string) =>
     productos.find((p) => p.id === producto_id)?.stock ?? 0;
@@ -135,8 +142,14 @@ export default function POS() {
   async function cobrar() {
     setError("");
     setMensaje("");
-    const montoFinal = monto > 0 ? monto : total;
-    const pagos = montoFinal > 0 ? [{ monto: montoFinal, metodo }] : [];
+
+    if (metodo === "efectivo" && recibido < total) {
+      setError("El efectivo recibido es insuficiente para el total.");
+      return;
+    }
+
+    const pagos = total > 0 ? [{ monto: total, metodo }] : [];
+
     try {
       await api("/ventas", {
         method: "POST",
@@ -150,7 +163,7 @@ export default function POS() {
       });
       setMensaje(`Venta registrada por ${formatMoney(total)}`);
       setCart([]);
-      setMonto(0);
+      setRecibido(0);
       setCartOpen(false);
       await cargar();
     } catch (err) {
@@ -257,7 +270,7 @@ export default function POS() {
                       </button>
                     </span>
                   </td>
-                  <td>{formatMoney(i.precio * i.cantidad)}</td>
+                  <td className="num">{formatMoney(i.precio * i.cantidad)}</td>
                   <td>
                     <button
                       className="ghost small"
@@ -269,28 +282,75 @@ export default function POS() {
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr className="total-row">
+                <td colSpan={3} className="total-label">
+                  TOTAL
+                </td>
+                <td className="total-amount num">
+                  {formatMoney(total)}
+                </td>
+                <td></td>
+              </tr>
+            </tfoot>
           </table>
         )}
 
-        <div className="total">{formatMoney(total)}</div>
-
         <div className="payment">
-          <select value={metodo} onChange={(e) => setMetodo(e.target.value)}>
-            <option value="efectivo">Efectivo</option>
-            <option value="transferencia">Transferencia</option>
-            <option value="tarjeta">Tarjeta</option>
-          </select>
-          <MoneyInput
-            placeholder="Monto (opcional)"
-            value={monto}
-            onChange={setMonto}
-          />
+          <div className="pay-top">
+            <label className="pay-label" htmlFor="metodo-pago">
+              Método de pago
+            </label>
+            <select
+              id="metodo-pago"
+              value={metodo}
+              onChange={(e) => setMetodo(e.target.value)}
+            >
+              <option value="efectivo">Efectivo</option>
+              <option value="transferencia">Transferencia</option>
+              <option value="tarjeta">Tarjeta</option>
+            </select>
+          </div>
+
+          {metodo === "efectivo" && (
+            <div className="pay-efectivo">
+              <div className="pay-field">
+                <label className="pay-label" htmlFor="efectivo-recibido">
+                  Recibido
+                </label>
+                <MoneyInput
+                  value={recibido}
+                  onChange={setRecibido}
+                  placeholder="0"
+                />
+              </div>
+              <div
+                className={
+                  total > 0 && recibido < total
+                    ? "pay-result faltan"
+                    : "pay-result devuelta"
+                }
+              >
+                <span className="pay-result-label">
+                  {total > 0 && recibido < total ? "Falta" : "Devuelta"}
+                </span>
+                <strong>
+                  {formatMoney(
+                    recibido >= total ? recibido - total : total - recibido
+                  )}
+                </strong>
+              </div>
+            </div>
+          )}
+
           <button
-            className="primary"
-            disabled={cart.length === 0}
+            className="primary pay-cobrar"
+            disabled={
+              cart.length === 0 || (metodo === "efectivo" && recibido < total)
+            }
             onClick={cobrar}
           >
-            Cobrar
+            Cobrar · {formatMoney(total)}
           </button>
         </div>
         {mensaje && <p className="ok">{mensaje}</p>}
@@ -315,6 +375,12 @@ export default function POS() {
               </div>
             )}
             <h3>{modal.nombre}</h3>
+            {(() => {
+              const cat = categorias.find(
+                (c) => c.id === modal.categoria_id
+              );
+              return cat ? <p className="product-cat">{cat.nombre}</p> : null;
+            })()}
             <p className="muted">
               {formatMoney(modal.precio)} · stock {modal.stock}
             </p>

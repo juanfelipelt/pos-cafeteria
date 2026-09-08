@@ -248,7 +248,7 @@ export default function Compras() {
                 onClick={() => setAbierta(abierta === c.id ? null : c.id)}
               >
                 <td data-label="Fecha">
-                  {new Date(c.fecha).toLocaleString("es-ES", {
+                  {new Date(c.fecha).toLocaleString(undefined, {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",

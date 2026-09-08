@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from application.schemas.producto import EstadoRequest, ProductoCreate, ProductoUpdate
 from application.services.producto_service import ProductoService
 from database import get_session
-from infrastructure.api.dependencies import get_current_user
+from infrastructure.api.dependencies import get_current_user, require_admin
 from infrastructure.repositories.producto_repository import (
     SQLAlchemyProductoRepository,
 )
@@ -28,7 +28,7 @@ def listar(
 def crear(
     body: ProductoCreate,
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     service = ProductoService(SQLAlchemyProductoRepository(db), db)
     return service.crear(
@@ -56,7 +56,7 @@ def actualizar(
     producto_id: str,
     body: ProductoUpdate,
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     service = ProductoService(SQLAlchemyProductoRepository(db), db)
     return service.actualizar(
@@ -75,7 +75,7 @@ def cambiar_estado(
     producto_id: str,
     body: EstadoRequest,
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     service = ProductoService(SQLAlchemyProductoRepository(db), db)
     return service.cambiar_estado(producto_id, body.estado).to_dict()

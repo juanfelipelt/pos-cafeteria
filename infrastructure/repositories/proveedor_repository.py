@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from domain.entities.proveedor import Proveedor
@@ -35,6 +36,7 @@ class SQLAlchemyProveedorRepository(ProveedorRepository):
             q = q.filter(ProveedorModel.nombre.ilike(f"%{filtro}%"))
         if solo_activos:
             q = q.filter(ProveedorModel.estado.is_(True))
+        q = q.order_by(func.lower(ProveedorModel.nombre).asc(), ProveedorModel.nombre.asc())
         return [_to_entity(m) for m in q.all()]
 
     def add(self, proveedor: Proveedor) -> Proveedor:

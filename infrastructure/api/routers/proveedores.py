@@ -35,7 +35,7 @@ def listar(
 def crear(
     body: ProveedorCreate,
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     return _build_service(db).crear(
         body.nombre,
@@ -62,7 +62,7 @@ def actualizar(
     proveedor_id: str,
     body: ProveedorUpdate,
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     return _build_service(db).actualizar(
         proveedor_id,
@@ -81,7 +81,7 @@ def cambiar_estado(
     proveedor_id: str,
     body: EstadoRequest,
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     return _build_service(db).cambiar_estado(proveedor_id, body.estado).to_dict()
 

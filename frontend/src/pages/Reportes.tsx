@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import {
   Bar,
   BarChart,
@@ -8,6 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import { api } from "../api";
+import { useAuth } from "../auth";
 import { formatMoney, formatNumber } from "../lib/format";
 
 interface Punto {
@@ -17,6 +19,7 @@ interface Punto {
 }
 
 export default function Reportes() {
+  const { user } = useAuth();
   const [desde, setDesde] = useState(
     new Date(new Date().getFullYear(), new Date().getMonth(), 1)
       .toISOString()
@@ -26,6 +29,8 @@ export default function Reportes() {
   const [agrupacion, setAgrupacion] = useState("dia");
   const [data, setData] = useState<Punto[]>([]);
   const [error, setError] = useState("");
+
+  if (user?.rol !== "admin") return <Navigate to="/" replace />;
 
   async function consultar() {
     setError("");

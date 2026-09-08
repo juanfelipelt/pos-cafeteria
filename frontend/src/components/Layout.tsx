@@ -27,9 +27,9 @@ export default function Layout() {
     { to: "/ventas", label: "Ventas", icon: "receipt_long" },
     { to: "/proveedores", label: "Proveedores", icon: "local_shipping" },
     { to: "/compras", label: "Compras", icon: "shopping_cart" },
-    { to: "/reportes", label: "Reportes", icon: "monitoring" },
   ];
   if (user?.rol === "admin") {
+    links.push({ to: "/reportes", label: "Reportes", icon: "monitoring" });
     links.push({ to: "/usuarios", label: "Usuarios", icon: "group" });
     links.push({ to: "/configuracion", label: "Configuración", icon: "settings" });
   }
@@ -44,6 +44,7 @@ export default function Layout() {
             <span className="logo-placeholder">B</span>
           )}
           <span className="brand-name">Cafetería POS</span>
+          <span className="brand-badge">POS</span>
         </div>
 
         <nav className="sidebar-nav">
@@ -88,6 +89,7 @@ export default function Layout() {
               <span className="logo-placeholder">B</span>
             )}
             Cafetería POS
+            <span className="brand-badge">POS</span>
           </span>
           <span className="topbar-user">{user?.nombre?.split(" ")[0]}</span>
         </header>

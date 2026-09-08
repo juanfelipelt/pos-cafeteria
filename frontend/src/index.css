@@ -11,14 +11,29 @@
   --accent-hover: #4a473f;
   --danger: #c0392b;
   --success: #2e7d32;
-  --radius: 8px;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --radius: 0.8rem;
+  --shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.04);
   --font: "Liter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+   Tamaño base de la UI. 1rem = font-size del html.
+   62.5%   -> raíz 10px  (estándar)
+   78.125% -> raíz 12.5px (equivale a un zoom de navegador de ~125%)
+   Sube/baja este % para escalar toda la interfaz (textos y espaciados, que
+   están en rem) manteniendo accesibilidad (respeta la fuente del usuario).
+*/
+html {
+  font-size: 78.125%;
 }
 
 html,
@@ -28,12 +43,11 @@ body,
 }
 
 body {
-  margin: 0;
   font-family: var(--font);
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
-  font-size: 14px;
+  font-size: 1.4rem;
   line-height: 1.5;
 }
 
@@ -44,13 +58,13 @@ body {
 
 /* ---------- Sidebar ---------- */
 .sidebar {
-  width: 232px;
+  width: 23.2rem;
   flex-shrink: 0;
   background: var(--bg-muted);
-  border-right: 1px solid var(--border);
+  border-right: 0.1rem solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 16px 10px;
+  padding: 1.6rem 1rem;
   position: sticky;
   top: 0;
   height: 100vh;
@@ -59,63 +73,76 @@ body {
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 8px 18px;
+  gap: 1rem;
+  padding: 0.4rem 0.8rem 1.8rem;
 }
 
 .logo {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.6rem;
   object-fit: cover;
 }
 
 .logo-placeholder {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.6rem;
   background: var(--accent);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .logo-placeholder.large {
-  width: 44px;
-  height: 44px;
-  font-size: 22px;
-  border-radius: 10px;
+  width: 4.4rem;
+  height: 4.4rem;
+  font-size: 2.2rem;
+  border-radius: 1rem;
 }
 
 .brand-name {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 1.5rem;
+}
+
+.brand-badge {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  background: var(--bg);
+  border: 0.1rem solid var(--border-strong);
+  border-radius: 0.6rem;
+  padding: 0.1rem 0.6rem;
+  line-height: 1.4;
+  margin-left: -0.7rem;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.2rem;
   flex: 1;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  border-radius: 6px;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.6rem;
   color: var(--text-secondary);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 1.4rem;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .nav-item .material-symbols-outlined {
-  font-size: 20px;
+  font-size: 2rem;
   color: var(--text-faint);
   transition: color 0.15s ease;
 }
@@ -137,27 +164,27 @@ body {
 }
 
 .sidebar-footer {
-  border-top: 1px solid var(--border);
-  padding: 12px 8px 4px;
+  border-top: 0.1rem solid var(--border);
+  padding: 1.2rem 0.8rem 0.4rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.8rem;
 }
 
 .user-name {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 1.3rem;
 }
 
 /* ---------- Main ---------- */
 .main {
   flex: 1;
   min-width: 0;
-  padding: 28px 40px 60px;
+  padding: 2.8rem 4rem 6rem;
 }
 
 .page {
-  max-width: 980px;
+  max-width: 98rem;
   margin: 0 auto;
   animation: fadeUp 0.3s ease;
 }
@@ -165,7 +192,7 @@ body {
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(0.6rem);
   }
   to {
     opacity: 1;
@@ -174,33 +201,33 @@ body {
 }
 
 h2 {
-  font-size: 22px;
+  font-size: 2.2rem;
   font-weight: 600;
-  margin: 0 0 18px;
+  margin: 0 0 1.8rem;
   letter-spacing: -0.01em;
 }
 
 h3 {
-  font-size: 15px;
+  font-size: 1.5rem;
   font-weight: 600;
-  margin: 0 0 12px;
+  margin: 0 0 1.2rem;
 }
 
 /* ---------- Cards ---------- */
 .card {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 0.1rem solid var(--border);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 1.8rem;
   box-shadow: var(--shadow);
-  margin-bottom: 16px;
+  margin-bottom: 1.6rem;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .cards {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 1.6rem;
+  margin-bottom: 1.6rem;
 }
 
 .cards .card {
@@ -211,7 +238,7 @@ h3 {
 }
 
 .cards strong {
-  font-size: 26px;
+  font-size: 2.6rem;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -223,7 +250,7 @@ h3 {
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 1.6rem;
 }
 
 @media (max-width: 840px) {
@@ -237,10 +264,10 @@ h3 {
 /* ---------- Forms ---------- */
 input,
 select {
-  padding: 7px 10px;
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 0.7rem 1rem;
+  border: 0.1rem solid var(--border-strong);
+  border-radius: 0.6rem;
+  font-size: 1.4rem;
   font-family: inherit;
   color: var(--text);
   background: #fff;
@@ -251,20 +278,20 @@ input:focus,
 select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(55, 53, 47, 0.08);
+  box-shadow: 0 0 0 0.2rem rgba(55, 53, 47, 0.08);
 }
 
 label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
+  gap: 0.4rem;
+  font-size: 1.3rem;
   color: var(--text-secondary);
 }
 
 .inline-form {
   display: flex;
-  gap: 8px;
+  gap: 0.8rem;
   align-items: flex-end;
   flex-wrap: wrap;
 }
@@ -275,13 +302,13 @@ label {
 
 /* ---------- Buttons ---------- */
 button {
-  border: 1px solid transparent;
+  border: 0.1rem solid transparent;
   background: var(--accent);
   color: #fff;
-  padding: 7px 14px;
-  border-radius: 6px;
+  padding: 0.7rem 1.4rem;
+  border-radius: 0.6rem;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-family: inherit;
   font-weight: 500;
   transition: background 0.15s ease, transform 0.05s ease, opacity 0.15s ease;
@@ -292,7 +319,7 @@ button:hover {
 }
 
 button:active {
-  transform: translateY(1px);
+  transform: translateY(0.1rem);
 }
 
 button:disabled {
@@ -315,8 +342,8 @@ button.ghost:hover {
 }
 
 button.small {
-  padding: 2px 9px;
-  font-size: 15px;
+  padding: 0.2rem 0.9rem;
+  font-size: 1.5rem;
   line-height: 1.4;
 }
 
@@ -328,19 +355,19 @@ table {
 
 th {
   text-align: left;
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--text-faint);
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+  border-bottom: 0.1rem solid var(--border);
 }
 
 td {
-  padding: 10px;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
+  padding: 1rem;
+  border-bottom: 0.1rem solid var(--border);
+  font-size: 1.4rem;
 }
 
 tbody tr {
@@ -355,7 +382,7 @@ tbody tr:hover {
 .pos {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 1.6rem;
 }
 
 @media (max-width: 840px) {
@@ -368,16 +395,16 @@ tbody tr:hover {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 460px;
+  max-height: 46rem;
   overflow: auto;
 }
 
 .product-list li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 4px;
-  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+  padding: 0.8rem 0.4rem;
+  border-bottom: 0.1rem solid var(--border);
 }
 
 .product-list li span {
@@ -389,16 +416,21 @@ tbody tr:hover {
 }
 
 .total {
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: 600;
-  margin: 16px 0;
+  margin: 1.6rem 0;
   letter-spacing: -0.01em;
 }
 
 .payment {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: var(--bg-muted);
+  border: 0.1rem solid var(--border);
+  border-radius: 1rem;
+  padding: 1.4rem;
+  margin-top: 1rem;
 }
 
 /* ---------- Login ---------- */
@@ -411,30 +443,30 @@ tbody tr:hover {
 }
 
 .login-card {
-  width: 340px;
+  width: 34rem;
   background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 0.1rem solid var(--border);
+  border-radius: 1.2rem;
   box-shadow: var(--shadow);
-  padding: 32px;
+  padding: 3.2rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1.2rem;
   text-align: center;
   animation: fadeUp 0.35s ease;
 }
 
 .login-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 1rem;
   object-fit: cover;
   margin: 0 auto;
 }
 
 .login-card h1 {
   margin: 0;
-  font-size: 20px;
+  font-size: 2rem;
   font-weight: 600;
 }
 
@@ -443,7 +475,7 @@ tbody tr:hover {
 }
 
 .login-card button {
-  margin-top: 6px;
+  margin-top: 0.6rem;
 }
 
 /* ---------- Misc ---------- */
@@ -453,12 +485,12 @@ tbody tr:hover {
 
 .error {
   color: var(--danger);
-  font-size: 13px;
+  font-size: 1.3rem;
 }
 
 .ok {
   color: var(--success);
-  font-size: 13px;
+  font-size: 1.3rem;
 }
 
 .feed {
@@ -470,25 +502,25 @@ tbody tr:hover {
 .feed li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 0.1rem solid var(--border);
+  font-size: 1.4rem;
 }
 
 .tag {
   background: var(--bg-muted);
   color: var(--text-secondary);
-  border-radius: 4px;
-  padding: 1px 7px;
-  font-size: 12px;
+  border-radius: 0.4rem;
+  padding: 0.1rem 0.7rem;
+  font-size: 1.2rem;
 }
 
 .pill {
   display: inline-block;
-  padding: 1px 8px;
-  border-radius: 999px;
-  font-size: 12px;
+  padding: 0.1rem 0.8rem;
+  border-radius: 99.9rem;
+  font-size: 1.2rem;
 }
 
 .pill.on {
@@ -504,16 +536,16 @@ tbody tr:hover {
 /* ---------- Configuración ---------- */
 .logo-editor {
   display: flex;
-  gap: 20px;
+  gap: 2rem;
   align-items: center;
-  margin: 12px 0;
+  margin: 1.2rem 0;
 }
 
 .logo-preview {
-  width: 96px;
-  height: 96px;
-  border: 1px dashed var(--border-strong);
-  border-radius: 12px;
+  width: 9.6rem;
+  height: 9.6rem;
+  border: 0.1rem dashed var(--border-strong);
+  border-radius: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -530,16 +562,16 @@ tbody tr:hover {
 .logo-preview .logo-placeholder {
   width: auto;
   height: auto;
-  padding: 8px 14px;
+  padding: 0.8rem 1.4rem;
   background: transparent;
   color: var(--text-faint);
-  font-size: 13px;
+  font-size: 1.3rem;
 }
 
 .logo-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.8rem;
 }
 
 /* ---------- Material Symbols ---------- */
@@ -547,7 +579,7 @@ tbody tr:hover {
   font-family: "Material Symbols Outlined";
   font-weight: normal;
   font-style: normal;
-  font-size: 20px;
+  font-size: 2rem;
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;
@@ -563,19 +595,19 @@ tbody tr:hover {
 /* ---------- Chips (filtro de categorías) ---------- */
 .chips {
   display: flex;
-  gap: 8px;
+  gap: 0.8rem;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: 1.6rem;
 }
 
 .chip {
-  padding: 5px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong);
+  padding: 0.5rem 1.2rem;
+  border-radius: 99.9rem;
+  border: 0.1rem solid var(--border-strong);
   background: #fff;
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 1.3rem;
   font-weight: 500;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
@@ -593,13 +625,13 @@ tbody tr:hover {
 /* ---------- Grid de productos ---------- */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1.4rem;
 }
 
 .product-card {
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 0.1rem solid var(--border);
+  border-radius: 1rem;
   overflow: hidden;
   cursor: pointer;
   background: #fff;
@@ -608,8 +640,8 @@ tbody tr:hover {
 }
 
 .product-card:hover {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+  box-shadow: 0 0.4rem 1.4rem rgba(0, 0, 0, 0.08);
+  transform: translateY(-0.2rem);
   border-color: var(--border-strong);
 }
 
@@ -630,27 +662,27 @@ tbody tr:hover {
 }
 
 .product-thumb .material-symbols-outlined {
-  font-size: 40px;
+  font-size: 4rem;
 }
 
 .product-info {
-  padding: 10px 12px;
+  padding: 1rem 1.2rem;
 }
 
 .product-info .name {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 1.4rem;
   display: block;
 }
 
 .product-info .price {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 1.3rem;
 }
 
 .product-info .stock {
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: 1.2rem;
 }
 
 /* ---------- Modal ---------- */
@@ -667,11 +699,11 @@ tbody tr:hover {
 
 .modal {
   background: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  width: 320px;
+  border-radius: 1.2rem;
+  padding: 2.4rem;
+  width: 32rem;
   max-width: 92vw;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1rem 4rem rgba(0, 0, 0, 0.15);
   animation: fadeUp 0.2s ease;
 }
 
@@ -685,47 +717,47 @@ tbody tr:hover {
 }
 
 .modal h3 {
-  margin-bottom: 16px;
+  margin-bottom: 1.6rem;
 }
 
 .modal .thumb-lg {
   width: 100%;
-  height: 140px;
+  height: 14rem;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 0.8rem;
   background: var(--bg-muted);
-  margin-bottom: 16px;
+  margin-bottom: 1.6rem;
 }
 
 .qty-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1.2rem;
   justify-content: center;
-  margin: 16px 0;
+  margin: 1.6rem 0;
 }
 
 .qty-row .num {
-  font-size: 22px;
+  font-size: 2.2rem;
   font-weight: 600;
-  min-width: 40px;
+  min-width: 4rem;
   text-align: center;
 }
 
 .qty-btn {
-  width: 36px;
-  height: 36px;
+  width: 3.6rem;
+  height: 3.6rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  font-size: 20px;
+  font-size: 2rem;
 }
 
 .modal-actions {
   display: flex;
-  gap: 8px;
+  gap: 0.8rem;
 }
 
 .modal-actions button {
@@ -734,9 +766,9 @@ tbody tr:hover {
 
 /* ---------- Carrito ---------- */
 .cart-thumb {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 0.6rem;
   object-fit: cover;
   background: var(--bg-muted);
   display: flex;
@@ -746,24 +778,24 @@ tbody tr:hover {
 }
 
 .cart-thumb .material-symbols-outlined {
-  font-size: 20px;
+  font-size: 2rem;
 }
 
 .cart-controls {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.6rem;
 }
 
 .cart-controls button {
-  width: 26px;
-  height: 26px;
+  width: 2.6rem;
+  height: 2.6rem;
   padding: 0;
-  border-radius: 6px;
+  border-radius: 0.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 /* ---------- Ventas ---------- */
@@ -773,10 +805,10 @@ tbody tr:hover {
 
 .detail-panel {
   background: var(--bg-muted);
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-top: 8px;
-  font-size: 14px;
+  border-radius: 0.8rem;
+  padding: 1.2rem 1.6rem;
+  margin-top: 0.8rem;
+  font-size: 1.4rem;
 }
 
 /* ---------- Danger button ---------- */
@@ -793,20 +825,20 @@ button.danger:hover {
   align-items: center;
   justify-content: center;
   color: var(--text-faint);
-  font-size: 15px;
+  font-size: 1.5rem;
 }
 
 /* ---------- File label (input de imagen) ---------- */
 .file-label {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 12px;
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
+  gap: 0.6rem;
+  padding: 0.7rem 1.2rem;
+  border: 0.1rem solid var(--border-strong);
+  border-radius: 0.6rem;
   cursor: pointer;
   color: var(--text);
-  font-size: 14px;
+  font-size: 1.4rem;
   transition: background 0.15s ease;
 }
 
@@ -815,7 +847,7 @@ button.danger:hover {
 }
 
 .file-label .material-symbols-outlined {
-  font-size: 18px;
+  font-size: 1.8rem;
   color: var(--text-secondary);
 }
 
@@ -834,8 +866,8 @@ button.danger:hover {
   background: transparent;
   border: none;
   color: var(--text);
-  padding: 6px;
-  border-radius: 6px;
+  padding: 0.6rem;
+  border-radius: 0.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -865,27 +897,27 @@ button.danger:hover {
   .topbar-mobile {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 1rem;
     position: sticky;
     top: 0;
     z-index: 40;
     background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 8px 14px;
-    height: 52px;
+    border-bottom: 0.1rem solid var(--border);
+    padding: 0.8rem 1.4rem;
+    height: 5.2rem;
   }
 
   .topbar-title {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.8rem;
     font-weight: 600;
     flex: 1;
   }
 
   .topbar-user {
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 1.3rem;
   }
 
   /* ---------- Sidebar como drawer ---------- */
@@ -897,7 +929,7 @@ button.danger:hover {
     height: 100vh;
     transform: translateX(-100%);
     transition: transform 0.22s ease;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 0 3rem rgba(0, 0, 0, 0.12);
   }
 
   .sidebar.open {
@@ -914,17 +946,17 @@ button.danger:hover {
 
   /* ---------- Main ---------- */
   .main {
-    padding: 16px 16px 96px;
+    padding: 1.6rem 1.6rem 9.6rem;
     min-width: 0;
   }
 
   .page {
     max-width: 100%;
-    margin-top: 18px;
+    margin-top: 1.8rem;
   }
 
   h2 {
-    font-size: 20px;
+    font-size: 2rem;
   }
 
   /* ---------- Grids a una columna ---------- */
@@ -936,7 +968,7 @@ button.danger:hover {
 
   .pos {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 1.2rem;
   }
 
   .pos .card.cart {
@@ -948,8 +980,8 @@ button.danger:hover {
     margin: 0;
     max-height: 82vh;
     overflow: auto;
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.14);
+    border-radius: 1.6rem 1.6rem 0 0;
+    box-shadow: 0 -0.4rem 2.4rem rgba(0, 0, 0, 0.14);
     transform: translateY(105%);
     transition: transform 0.24s ease;
   }
@@ -961,7 +993,7 @@ button.danger:hover {
   .pos-bar {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 1rem;
     position: fixed;
     left: 0;
     right: 0;
@@ -969,8 +1001,8 @@ button.danger:hover {
     z-index: 44;
     background: var(--accent);
     color: #fff;
-    padding: 12px 16px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.12);
+    padding: 1.2rem 1.6rem;
+    box-shadow: 0 -0.2rem 1rem rgba(0, 0, 0, 0.12);
   }
 
   .cart-close {
@@ -983,7 +1015,7 @@ button.danger:hover {
 
   .pos-bar .pos-total {
     flex: 1;
-    font-size: 17px;
+    font-size: 1.7rem;
     font-weight: 600;
   }
 
@@ -1008,10 +1040,10 @@ button.danger:hover {
   tbody tr {
     display: block;
     background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 4px 0;
-    margin-bottom: 10px;
+    border: 0.1rem solid var(--border);
+    border-radius: 1rem;
+    padding: 0.4rem 0;
+    margin-bottom: 1rem;
   }
 
   tbody tr:hover {
@@ -1022,10 +1054,10 @@ button.danger:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
+    gap: 1.2rem;
+    padding: 0.8rem 1.2rem;
+    border-bottom: 0.1rem solid var(--border);
+    font-size: 1.4rem;
     text-align: right;
   }
 
@@ -1037,7 +1069,7 @@ button.danger:hover {
   td::before {
     content: attr(data-label);
     color: var(--text-faint);
-    font-size: 12px;
+    font-size: 1.2rem;
     text-align: left;
   }
 
@@ -1053,7 +1085,7 @@ button.danger:hover {
   td.no-label .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 0.6rem;
     margin-left: auto;
   }
 
@@ -1063,13 +1095,13 @@ button.danger:hover {
     border: none;
     box-shadow: none;
     padding: 0;
-    margin: -6px 0 12px;
+    margin: -0.6rem 0 1.2rem;
   }
 
   tr.detalle-row td {
     display: block;
     background: transparent;
-    padding: 0 12px;
+    padding: 0 1.2rem;
   }
 
   tr.detalle-row td::before {
@@ -1131,7 +1163,7 @@ button.danger:hover {
 
   .pos .cart td {
     display: table-cell;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 0.1rem solid var(--border);
     text-align: left;
   }
 
@@ -1156,7 +1188,7 @@ button.danger:hover {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
+    padding-bottom: 0.4rem;
   }
 
   .chip {
@@ -1165,19 +1197,19 @@ button.danger:hover {
 
   /* ---------- Login ---------- */
   .login {
-    padding: 20px;
+    padding: 2rem;
   }
 
   .login-card {
     width: 100%;
-    max-width: 380px;
+    max-width: 38rem;
   }
 
   .modal {
     width: 100%;
     max-width: 100vw;
-    border-radius: 14px 14px 0 0;
-    padding: 20px;
+    border-radius: 1.4rem 1.4rem 0 0;
+    padding: 2rem;
   }
 
   .modal-overlay {
@@ -1187,28 +1219,28 @@ button.danger:hover {
 
 @media (max-width: 480px) {
   .main {
-    padding: 12px 12px 96px;
+    padding: 1.2rem 1.2rem 9.6rem;
   }
 
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 1rem;
   }
 
   .product-info {
-    padding: 8px 10px;
+    padding: 0.8rem 1rem;
   }
 
   .product-info .name {
-    font-size: 13px;
+    font-size: 1.3rem;
   }
 
   .product-thumb .material-symbols-outlined {
-    font-size: 32px;
+    font-size: 3.2rem;
   }
 
   .card {
-    padding: 14px;
+    padding: 1.4rem;
   }
 
   .logo-editor {
@@ -1218,6 +1250,131 @@ button.danger:hover {
   }
 
   .pos-total {
-    font-size: 16px;
+    font-size: 1.6rem;
   }
+}
+
+/* ---------- POS: pago (recibido / devuelta) ---------- */
+.pay-label {
+  font-size: 1.2rem;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.pay-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pay-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.payment select,
+.payment input {
+  width: 100%;
+}
+
+.pay-efectivo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.6rem;
+  align-items: end;
+}
+
+.pay-result {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  gap: 0;
+  padding: 0.2rem 0 0.4rem;
+}
+
+.pay-result-label {
+  font-size: 1.2rem;
+  color: var(--text-faint);
+}
+
+.pay-result strong {
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.pay-result.devuelta strong {
+  color: var(--success);
+}
+
+.pay-result.faltan strong {
+  color: var(--danger);
+}
+
+.pay-cobrar {
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .pay-efectivo {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .pay-result {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    text-align: left;
+    padding: 0.2rem 0;
+  }
+}
+
+/* ---------- Modal de producto: categoría y botones estables ---------- */
+.product-cat {
+  font-size: 1.2rem;
+  color: var(--text-faint);
+  margin: -0.6rem 0 1rem;
+}
+
+.modal h3 {
+  overflow-wrap: anywhere;
+}
+
+.modal-actions .ghost {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.modal-actions .primary {
+  flex: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+/* ---------- POS cuenta: total alineado con subtotales ---------- */
+.pos .cart td.num {
+  text-align: right;
+}
+
+.pos .cart .total-row td {
+  border-top: 0.1rem solid var(--border-strong);
+  padding-top: 1.2rem;
+  padding-bottom: 0.8rem;
+}
+
+.pos .cart .total-row td.total-label {
+  color: var(--text-faint);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pos .cart .total-row td.total-amount {
+  font-size: 1.8rem;
+  font-weight: 700;
 }

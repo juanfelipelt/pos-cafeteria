@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from domain.entities.producto import Producto
@@ -39,6 +40,7 @@ class SQLAlchemyProductoRepository(ProductoRepository):
             q = q.filter(ProductoModel.categoria_id == categoria_id)
         if solo_activos:
             q = q.filter(ProductoModel.estado.is_(True))
+        q = q.order_by(func.lower(ProductoModel.nombre).asc(), ProductoModel.nombre.asc())
         return [_to_entity(m) for m in q.all()]
 
     def add(self, producto: Producto) -> Producto:

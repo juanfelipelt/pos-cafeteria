@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from application.schemas.categoria import CategoriaCreate, CategoriaUpdate
 from application.services.categoria_service import CategoriaService
 from database import get_session
-from infrastructure.api.dependencies import get_current_user
+from infrastructure.api.dependencies import get_current_user, require_admin
 from infrastructure.repositories.categoria_repository import (
     SQLAlchemyCategoriaRepository,
 )
@@ -22,7 +22,7 @@ def listar(db: Session = Depends(get_session), _=Depends(get_current_user)):
 def crear(
     body: CategoriaCreate,
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     service = CategoriaService(SQLAlchemyCategoriaRepository(db), db)
     return service.crear(body.nombre, body.descripcion).to_dict()
@@ -43,7 +43,7 @@ def actualizar(
     categoria_id: str,
     body: CategoriaUpdate,
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     service = CategoriaService(SQLAlchemyCategoriaRepository(db), db)
     return service.actualizar(categoria_id, body.nombre, body.descripcion).to_dict()

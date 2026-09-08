@@ -136,8 +136,9 @@ export default function Proveedores() {
 
       {error && <p className="error">{error}</p>}
 
-      <form onSubmit={crear} className="card">
-        <h3>Nuevo proveedor</h3>
+      {user?.rol === "admin" && (
+        <form onSubmit={crear} className="card">
+          <h3>Nuevo proveedor</h3>
         <div className="inline-form">
           <select value={tipoId} onChange={(e) => setTipoId(e.target.value)}>
             <option value="" disabled>
@@ -184,6 +185,7 @@ export default function Proveedores() {
         </div>
         {ok && <p className="ok">{ok}</p>}
       </form>
+      )}
 
       <table>
         <thead>
@@ -194,7 +196,7 @@ export default function Proveedores() {
             <th>Teléfono</th>
             <th>Email</th>
             <th>Estado</th>
-            <th></th>
+            {user?.rol === "admin" && <th></th>}
           </tr>
         </thead>
         <tbody>
@@ -212,41 +214,41 @@ export default function Proveedores() {
                   {p.estado ? "Activo" : "Inactivo"}
                 </span>
               </td>
-              <td className="no-label">
-                <div className="actions">
-                  <button
-                    className="ghost"
-                    onClick={() =>
-                      setEditando({
-                        id: p.id,
-                        nombre: p.nombre,
-                        contacto: p.contacto,
-                        telefono: p.telefono,
-                        email: p.email,
-                        direccion: p.direccion,
-                        tipo_identificacion: p.tipo_identificacion,
-                        identificacion: p.identificacion,
-                      })
-                    }
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="ghost"
-                    onClick={() => cambiarEstado(p)}
-                  >
-                    {p.estado ? "Desactivar" : "Activar"}
-                  </button>
-                  {user?.rol === "admin" && (
+              {user?.rol === "admin" && (
+                <td className="no-label">
+                  <div className="actions">
+                    <button
+                      className="ghost"
+                      onClick={() =>
+                        setEditando({
+                          id: p.id,
+                          nombre: p.nombre,
+                          contacto: p.contacto,
+                          telefono: p.telefono,
+                          email: p.email,
+                          direccion: p.direccion,
+                          tipo_identificacion: p.tipo_identificacion,
+                          identificacion: p.identificacion,
+                        })
+                      }
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="ghost"
+                      onClick={() => cambiarEstado(p)}
+                    >
+                      {p.estado ? "Desactivar" : "Activar"}
+                    </button>
                     <button
                       className="ghost danger"
                       onClick={() => eliminar(p.id)}
                     >
                       Eliminar
                     </button>
-                  )}
-                </div>
-              </td>
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

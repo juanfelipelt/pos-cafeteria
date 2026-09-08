@@ -41,7 +41,7 @@ function estado(v: Venta): { label: string; clase: string } {
 }
 
 function fecha(v: Venta): string {
-  return new Date(v.fecha).toLocaleString("es-ES", {
+  return new Date(v.fecha).toLocaleString(undefined, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

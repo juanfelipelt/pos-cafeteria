@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from application.services.reporte_service import ReporteService
 from database import get_session
-from infrastructure.api.dependencies import get_current_user
+from infrastructure.api.dependencies import get_current_user, require_admin
 from infrastructure.repositories.reporte_repository import (
     SQLAlchemyReporteRepository,
 )
@@ -29,7 +29,7 @@ def ventas_por_periodo(
     hasta: datetime,
     agrupacion: str = "dia",
     db: Session = Depends(get_session),
-    _=Depends(get_current_user),
+    _=Depends(require_admin),
 ):
     return ReporteService(SQLAlchemyReporteRepository(db)).ventas_por_periodo(
         desde, hasta, agrupacion

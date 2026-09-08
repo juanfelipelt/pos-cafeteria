@@ -69,8 +69,9 @@ export default function Usuarios() {
           required
         />
         <input
-          placeholder="Contraseña"
+          placeholder="Contraseña (mínimo 8 caracteres)"
           type="password"
+          minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
