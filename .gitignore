@@ -22,3 +22,6 @@ dist-ssr/
 .idea/
 .DS_Store
 *.sw?
+
+# opencode (tooling local)
+.opencode/

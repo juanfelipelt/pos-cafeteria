@@ -8,12 +8,28 @@ from infrastructure.models.venta import VentaModel
 from infrastructure.models.detalle_venta import DetalleVentaModel
 
 _PATRONES = {
-    "dia": "%Y-%m-%d",
-    "semana": "%Y-W%W",
-    "mes": "%Y-%m",
-    "año": "%Y",
-    "year": "%Y",
+    "sqlite": {
+        "hora": "%H",
+        "dia": "%Y-%m-%d",
+        "semana": "%Y-W%W",
+        "mes": "%Y-%m",
+        "año": "%Y",
+        "year": "%Y",
+    },
+    "postgresql": {
+        "hora": "HH24",
+        "dia": "YYYY-MM-DD",
+        "semana": 'IYYY"-W"IW',
+        "mes": "YYYY-MM",
+        "año": "YYYY",
+        "year": "YYYY",
+    },
 }
+
+
+def _grupo_dialecto(session: Session) -> str:
+    nombre = session.get_bind().dialect.name
+    return "postgresql" if nombre.startswith("postgres") else "sqlite"
 
 
 class SQLAlchemyReporteRepository(ReporteRepository):
@@ -52,11 +68,15 @@ class SQLAlchemyReporteRepository(ReporteRepository):
     def ventas_por_periodo(
         self, desde: datetime, hasta: datetime, agrupacion: str
     ) -> list[dict]:
-        patron = _PATRONES.get(agrupacion)
+        grupo = _grupo_dialecto(self.session)
+        patron = _PATRONES[grupo].get(agrupacion)
         if patron is None:
             raise ValueError(f"Agrupación no válida: {agrupacion}")
 
-        periodo = func.strftime(patron, VentaModel.fecha).label("periodo")
+        if grupo == "postgresql":
+            periodo = func.to_char(VentaModel.fecha, patron).label("periodo")
+        else:
+            periodo = func.strftime(patron, VentaModel.fecha).label("periodo")
         total = func.coalesce(
             func.sum(DetalleVentaModel.cantidad * DetalleVentaModel.precio_unitario),
             0.0,

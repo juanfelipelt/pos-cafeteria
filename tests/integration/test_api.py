@@ -239,6 +239,31 @@ class TestReportes:
         assert len(r.json()) == 1
         assert r.json()[0]["num_ventas"] == 1
 
+    def test_actividad_por_hora(self, client, admin_headers, cajero_headers):
+        p = _create_producto(client, admin_headers, stock=10)
+        client.post(
+            "/ventas",
+            json={"items": [{"producto_id": p["id"], "cantidad": 1}], "pagos": []},
+            headers=admin_headers,
+        )
+        desde = "2000-01-01T00:00:00"
+        hasta = "2100-01-01T00:00:00"
+        r = client.get(
+            f"/reportes/actividad?desde={desde}&hasta={hasta}&agrupacion=hora",
+            headers=cajero_headers,
+        )
+        assert r.status_code == 200
+        assert len(r.json()) == 1
+        assert r.json()[0]["num_ventas"] == 1
+
+    def test_actividad_agrupacion_invalida(self, client, admin_headers):
+        r = client.get(
+            "/reportes/actividad?desde=2000-01-01T00:00:00"
+            "&hasta=2100-01-01T00:00:00&agrupacion=foo",
+            headers=admin_headers,
+        )
+        assert r.status_code == 422
+
 
 class TestSeguridad:
     def test_sin_token(self, client):

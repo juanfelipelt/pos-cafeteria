@@ -3,6 +3,7 @@ import { api } from "../api";
 import MoneyInput from "../components/MoneyInput";
 import { useAuth } from "../auth";
 import { formatMoney } from "../lib/format";
+import { comprimirImagen } from "../lib/image";
 
 interface Categoria {
   id: string;
@@ -65,21 +66,25 @@ export default function Productos() {
     cargar();
   }, []);
 
-  function onImagen(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onImagen(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setImagen(reader.result as string);
-    reader.readAsDataURL(file);
+    try {
+      setImagen(await comprimirImagen(file, { maxSize: 600, quality: 0.72 }));
+    } catch {
+      setError("No se pudo procesar la imagen.");
+    }
   }
 
-  function onImagenEdit(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onImagenEdit(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !editando) return;
-    const reader = new FileReader();
-    reader.onload = () =>
-      setEditando({ ...editando, imagen: reader.result as string });
-    reader.readAsDataURL(file);
+    try {
+      const imagen = await comprimirImagen(file, { maxSize: 600, quality: 0.72 });
+      setEditando({ ...editando, imagen });
+    } catch {
+      setError("No se pudo procesar la imagen.");
+    }
   }
 
   async function crearCategoria(e: React.FormEvent) {

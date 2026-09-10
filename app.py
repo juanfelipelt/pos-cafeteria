@@ -43,11 +43,13 @@ async def lifespan(app: FastAPI):
     yield
 
 
-def _default_sql(column) -> str:
+def _default_sql(column, dialect: str) -> str:
     default = getattr(column, "default", None)
     if default is not None and hasattr(default, "arg"):
         val = default.arg
         if isinstance(val, bool):
+            if dialect.startswith("postgres"):
+                return "true" if val else "false"
             return "1" if val else "0"
         if isinstance(val, (int, float)):
             return str(val)
@@ -59,6 +61,7 @@ def _default_sql(column) -> str:
 def _ensure_schema() -> None:
     Base.metadata.create_all(bind=engine)
     inspector = inspect(engine)
+    dialecto = engine.dialect.name
     with engine.begin() as conn:
         for table in Base.metadata.sorted_tables:
             if table.name not in inspector.get_table_names():
@@ -73,7 +76,7 @@ def _ensure_schema() -> None:
                 else:
                     ddl = (
                         f"ALTER TABLE {table.name} ADD COLUMN {column.name} "
-                        f"{col_type} NOT NULL DEFAULT {_default_sql(column)}"
+                        f"{col_type} NOT NULL DEFAULT {_default_sql(column, dialecto)}"
                     )
                 conn.execute(text(ddl))
 

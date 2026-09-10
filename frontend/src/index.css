@@ -27,13 +27,19 @@
 
 /*
    Tamaño base de la UI. 1rem = font-size del html.
-   62.5%   -> raíz 10px  (estándar)
-   78.125% -> raíz 12.5px (equivale a un zoom de navegador de ~125%)
-   Sube/baja este % para escalar toda la interfaz (textos y espaciados, que
-   están en rem) manteniendo accesibilidad (respeta la fuente del usuario).
+   El responsive (breakpoints en px) está calibrado con 1rem = 10px,
+   así que por defecto usamos 62.5% y SOLO en pantallas grandes (> 1100px)
+   subimos la escala a ~125% (raíz 12.5px), dando más tamaño en PC sin
+   romper el layout móvil.
 */
 html {
-  font-size: 78.125%;
+  font-size: 62.5%;
+}
+
+@media (min-width: 1100px) {
+  html {
+    font-size: 78.125%;
+  }
 }
 
 html,
@@ -259,6 +265,36 @@ h3 {
     grid-template-columns: 1fr;
     flex-direction: column;
   }
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.card-head h3 {
+  margin: 0;
+  min-width: 0;
+}
+
+.card-head select {
+  flex: 0 0 auto;
+}
+
+/* Evita que los gráficos (ResponsiveContainer) desborden su celda */
+.grid > *,
+.cards > * {
+  min-width: 0;
+}
+
+/* recharts pone tabindex en el svg: sin borde negro al clic (mouse),
+   pero conserva el outline al navegar con teclado */
+.recharts-surface:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* ---------- Forms ---------- */
@@ -1220,6 +1256,15 @@ button.danger:hover {
 @media (max-width: 480px) {
   .main {
     padding: 1.2rem 1.2rem 9.6rem;
+  }
+
+  .card-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .card-head select {
+    width: 100%;
   }
 
   .product-grid {

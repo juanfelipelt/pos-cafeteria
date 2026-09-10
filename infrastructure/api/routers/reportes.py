@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -30,6 +31,19 @@ def ventas_por_periodo(
     agrupacion: str = "dia",
     db: Session = Depends(get_session),
     _=Depends(require_admin),
+):
+    return ReporteService(SQLAlchemyReporteRepository(db)).ventas_por_periodo(
+        desde, hasta, agrupacion
+    )
+
+
+@router.get("/actividad")
+def actividad(
+    desde: datetime,
+    hasta: datetime,
+    agrupacion: Literal["hora", "dia", "semana", "mes"] = "hora",
+    db: Session = Depends(get_session),
+    _=Depends(get_current_user),
 ):
     return ReporteService(SQLAlchemyReporteRepository(db)).ventas_por_periodo(
         desde, hasta, agrupacion

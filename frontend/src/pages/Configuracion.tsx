@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../auth";
 import { useConfig } from "../config";
+import { comprimirImagen } from "../lib/image";
 
 export default function Configuracion() {
   const { user } = useAuth();
@@ -14,12 +15,14 @@ export default function Configuracion() {
 
   if (user?.rol !== "admin") return <Navigate to="/" replace />;
 
-  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setPreview(reader.result as string);
-    reader.readAsDataURL(file);
+    try {
+      setPreview(await comprimirImagen(file, { maxSize: 400 }));
+    } catch {
+      setError("No se pudo procesar la imagen.");
+    }
   }
 
   async function guardar() {
