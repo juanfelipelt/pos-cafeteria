@@ -2,14 +2,31 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from application.schemas.producto import EstadoRequest, ProductoCreate, ProductoUpdate
+from application.schemas.receta import RecetaUpdate
 from application.services.producto_service import ProductoService
+from application.services.receta_service import RecetaService
 from database import get_session
 from infrastructure.api.dependencies import get_current_user, require_admin
+from infrastructure.repositories.insumo_repository import (
+    SQLAlchemyInsumoRepository,
+)
 from infrastructure.repositories.producto_repository import (
     SQLAlchemyProductoRepository,
 )
+from infrastructure.repositories.receta_repository import (
+    SQLAlchemyRecetaRepository,
+)
 
 router = APIRouter(prefix="/productos", tags=["productos"])
+
+
+def _receta_service(db: Session) -> RecetaService:
+    return RecetaService(
+        SQLAlchemyRecetaRepository(db),
+        SQLAlchemyProductoRepository(db),
+        SQLAlchemyInsumoRepository(db),
+        db,
+    )
 
 
 @router.get("")
@@ -38,6 +55,7 @@ def crear(
         body.imagen,
         body.precio,
         body.stock,
+        body.tipo,
     ).to_dict()
 
 
@@ -67,6 +85,7 @@ def actualizar(
         body.imagen,
         body.precio,
         body.stock,
+        body.tipo,
     ).to_dict()
 
 
@@ -79,3 +98,31 @@ def cambiar_estado(
 ):
     service = ProductoService(SQLAlchemyProductoRepository(db), db)
     return service.cambiar_estado(producto_id, body.estado).to_dict()
+
+
+@router.get("/{producto_id}/receta")
+def obtener_receta(
+    producto_id: str,
+    db: Session = Depends(get_session),
+    _=Depends(get_current_user),
+):
+    return _receta_service(db).obtener(producto_id)
+
+
+@router.put("/{producto_id}/receta")
+def establecer_receta(
+    producto_id: str,
+    body: RecetaUpdate,
+    db: Session = Depends(get_session),
+    _=Depends(require_admin),
+):
+    items = [
+        {
+            "tipo": i.tipo,
+            "insumo_id": i.insumo_id,
+            "componente_producto_id": i.componente_producto_id,
+            "cantidad": i.cantidad,
+        }
+        for i in body.items
+    ]
+    return _receta_service(db).establecer(producto_id, items)

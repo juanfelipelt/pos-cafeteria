@@ -19,6 +19,7 @@ class ProductoService:
         imagen: str = "",
         precio: float = 0.0,
         stock: int = 0,
+        tipo: str = "comprado",
     ) -> Producto:
         producto = Producto(
             id=new_id(),
@@ -28,6 +29,7 @@ class ProductoService:
             imagen=imagen,
             precio=precio,
             stock=stock,
+            tipo=tipo,
         )
         self.productos.add(producto)
         self.session.commit()
@@ -56,6 +58,7 @@ class ProductoService:
         imagen: str | None = None,
         precio: float | None = None,
         stock: int | None = None,
+        tipo: str | None = None,
     ) -> Producto:
         producto = self.obtener(producto_id)
         if nombre is not None:
@@ -70,6 +73,8 @@ class ProductoService:
             producto.cambiar_precio(precio)
         if stock is not None:
             producto.cambiar_stock(stock)
+        if tipo is not None:
+            producto.cambiar_tipo(tipo)
         self.productos.update(producto)
         self.session.commit()
         return producto

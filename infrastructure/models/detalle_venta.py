@@ -13,5 +13,6 @@ class DetalleVentaModel(Base):
     nombre_producto = Column(String, nullable=False)
     cantidad = Column(Integer, nullable=False)
     precio_unitario = Column(Float, nullable=False)
+    costo_unitario = Column(Float, nullable=True)
 
     venta = relationship("VentaModel", back_populates="detalles")

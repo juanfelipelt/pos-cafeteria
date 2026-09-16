@@ -8,6 +8,10 @@ from infrastructure.models.pago import PagoModel
 from infrastructure.models.compra import CompraModel
 from infrastructure.models.detalle_compra import DetalleCompraModel
 from infrastructure.models.configuracion import ConfiguracionModel
+from infrastructure.models.insumo import InsumoModel
+from infrastructure.models.receta import RecetaModel
+from infrastructure.models.costo_fijo import CostoFijoModel
+from infrastructure.models.nota import NotaModel
 
 __all__ = [
     "UsuarioModel",
@@ -20,4 +24,8 @@ __all__ = [
     "CompraModel",
     "DetalleCompraModel",
     "ConfiguracionModel",
+    "InsumoModel",
+    "RecetaModel",
+    "CostoFijoModel",
+    "NotaModel",
 ]

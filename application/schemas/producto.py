@@ -8,6 +8,7 @@ class ProductoCreate(BaseModel):
     imagen: str = ""
     precio: float = 0.0
     stock: int = 0
+    tipo: str = "comprado"
 
 
 class ProductoUpdate(BaseModel):
@@ -17,6 +18,7 @@ class ProductoUpdate(BaseModel):
     imagen: str | None = None
     precio: float | None = None
     stock: int | None = None
+    tipo: str | None = None
 
 
 class EstadoRequest(BaseModel):

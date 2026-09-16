@@ -10,6 +10,7 @@ class DetalleVenta:
     cantidad: int
     precio_unitario: float
     id: str | None = None
+    costo_unitario: float | None = None
 
     def __post_init__(self) -> None:
         if not self.producto_id:
@@ -35,5 +36,6 @@ class DetalleVenta:
             "nombre_producto": self.nombre_producto,
             "cantidad": self.cantidad,
             "precio_unitario": self.precio_unitario,
+            "costo_unitario": self.costo_unitario,
             "subtotal": self.subtotal,
         }

@@ -27,7 +27,11 @@ from infrastructure.api.routers import (
     categorias,
     compras,
     configuracion,
+    costeo,
+    costos_fijos,
     eventos,
+    insumos,
+    notas,
     productos,
     proveedores,
     reportes,
@@ -127,6 +131,10 @@ app.include_router(compras.router)
 app.include_router(reportes.router)
 app.include_router(eventos.router)
 app.include_router(configuracion.router)
+app.include_router(insumos.router)
+app.include_router(costos_fijos.router)
+app.include_router(costeo.router)
+app.include_router(notas.router)
 
 
 @app.exception_handler(DomainError)

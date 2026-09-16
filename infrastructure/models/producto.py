@@ -14,3 +14,5 @@ class ProductoModel(Base):
     precio = Column(Float, nullable=False, default=0.0)
     stock = Column(Integer, nullable=False, default=0)
     estado = Column(Boolean, nullable=False, default=True)
+    tipo = Column(String, nullable=False, default="comprado")
+    costo = Column(Float, nullable=False, default=0.0)

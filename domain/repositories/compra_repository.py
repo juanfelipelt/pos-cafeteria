@@ -26,5 +26,20 @@ class CompraRepository(ABC):
         ...
 
     @abstractmethod
+    def suma_compras_insumo(
+        self, insumo_id: str, excluir_compra: str | None = None
+    ) -> tuple[float, float]:
+        """Devuelve (valor_total, cantidad_total) de las compras no anuladas
+        de un insumo. ``excluir_compra`` omite una compra concreta."""
+        ...
+
+    @abstractmethod
+    def suma_compras_producto(
+        self, producto_id: str, excluir_compra: str | None = None
+    ) -> tuple[float, float]:
+        """Igual que ``suma_compras_insumo`` pero para productos comprados."""
+        ...
+
+    @abstractmethod
     def delete(self, id: str) -> None:
         ...

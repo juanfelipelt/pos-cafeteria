@@ -4,6 +4,7 @@ from domain.entities.compra import Compra
 from domain.entities.detalle_compra import DetalleCompra
 from domain.entities.detalle_venta import DetalleVenta
 from domain.entities.enums import MetodoPago, Rol
+from domain.entities.nota import Nota
 from domain.entities.pago import Pago
 from domain.entities.producto import Producto
 from domain.entities.usuario import Usuario
@@ -65,12 +66,27 @@ class TestVenta:
 class TestCompra:
     def test_total_y_anular(self):
         detalle = DetalleCompra(
-            producto_id="p1", nombre_producto="Cafe", cantidad=10, precio_unitario=1.0
+            tipo="producto",
+            producto_id="p1",
+            nombre_producto="Cafe",
+            cantidad=10,
+            precio_unitario=1.0,
         )
         c = Compra(proveedor_id="prov1", detalles=[detalle])
         assert c.total == 10.0
         c.anular()
         assert c.anulada
+
+    def test_detalle_insumo(self):
+        detalle = DetalleCompra(
+            tipo="insumo",
+            insumo_id="i1",
+            nombre_insumo="Azucar",
+            cantidad=2.5,
+            precio_unitario=3.0,
+        )
+        assert detalle.nombre == "Azucar"
+        assert detalle.subtotal == 7.5
 
 
 class TestUsuario:
@@ -85,6 +101,24 @@ class TestUsuario:
     def test_to_dict_no_expone_hash(self):
         u = Usuario(nombre="A", email="a@x.com", contraseña_hash="secreto")
         assert "contraseña_hash" not in u.to_dict()
+
+
+class TestNota:
+    def test_texto_obligatorio(self):
+        with pytest.raises(ValueError):
+            Nota(texto="   ")
+
+    def test_tipo_invalido(self):
+        with pytest.raises(ValueError):
+            Nota(texto="x", tipo="otro")
+
+    def test_pendiente(self):
+        assert Nota(texto="x", tipo="tarea").pendiente
+        assert not Nota(texto="x", tipo="tarea", hecho=True).pendiente
+        assert Nota(texto="x", tipo="nota").pendiente
+        n = Nota(texto="x", tipo="nota")
+        n.archivar()
+        assert not n.pendiente
 
 
 class TestPago:

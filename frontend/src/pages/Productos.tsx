@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import MoneyInput from "../components/MoneyInput";
+import RecetaModal from "../components/RecetaModal";
 import { useAuth } from "../auth";
 import { formatMoney } from "../lib/format";
 import { comprimirImagen } from "../lib/image";
@@ -21,6 +22,8 @@ interface Producto {
   precio: number;
   stock: number;
   estado: boolean;
+  tipo: string;
+  costo: number;
 }
 
 interface Editando {
@@ -30,6 +33,7 @@ interface Editando {
   stock: number;
   categoria_id: string;
   imagen: string;
+  tipo: string;
 }
 
 export default function Productos() {
@@ -42,11 +46,13 @@ export default function Productos() {
   const [stock, setStock] = useState("");
   const [categoriaId, setCategoriaId] = useState("");
   const [imagen, setImagen] = useState("");
+  const [tipo, setTipo] = useState("comprado");
 
   const [nuevaCategoria, setNuevaCategoria] = useState("");
   const [catEditando, setCatEditando] = useState<{ id: string; nombre: string } | null>(null);
 
   const [editando, setEditando] = useState<Editando | null>(null);
+  const [recetaDe, setRecetaDe] = useState<Producto | null>(null);
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
   const [filtroCat, setFiltroCat] = useState<string | null>(null);
@@ -125,6 +131,7 @@ export default function Productos() {
           stock: Number(stock) || 0,
           categoria_id: categoriaId || null,
           imagen,
+          tipo,
         }),
       });
       setNombre("");
@@ -132,6 +139,7 @@ export default function Productos() {
       setStock("");
       setCategoriaId("");
       setImagen("");
+      setTipo("comprado");
       setOk("Producto creado.");
       await cargar();
     } catch (err) {
@@ -152,6 +160,7 @@ export default function Productos() {
           stock: editando.stock,
           categoria_id: editando.categoria_id || null,
           imagen: editando.imagen,
+          tipo: editando.tipo,
         }),
       });
       setEditando(null);
@@ -259,6 +268,11 @@ export default function Productos() {
                   </option>
                 ))}
               </select>
+              <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
+                <option value="comprado">Comprado (se revende)</option>
+                <option value="preparado">Preparado (receta de insumos)</option>
+                <option value="compuesto">Compuesto (combo)</option>
+              </select>
               <label className="file-label">
                 <span className="material-symbols-outlined">image</span>
                 Imagen
@@ -312,6 +326,7 @@ export default function Productos() {
             <th></th>
             <th>Nombre</th>
             <th>Categoría</th>
+            <th>Tipo</th>
             <th>Precio</th>
             <th>Stock</th>
             <th>Estado</th>
@@ -334,6 +349,7 @@ export default function Productos() {
                 {p.nombre}
               </td>
               <td data-label="Categoría">{categoriaDe(p.categoria_id)}</td>
+              <td data-label="Tipo">{p.tipo}</td>
               <td data-label="Precio">{formatMoney(p.precio)}</td>
               <td data-label="Stock">{p.stock}</td>
               <td data-label="Estado">
@@ -344,6 +360,11 @@ export default function Productos() {
               {esAdmin && (
                 <td className="no-label">
                   <div className="actions">
+                    {(p.tipo === "preparado" || p.tipo === "compuesto") && (
+                      <button className="ghost" onClick={() => setRecetaDe(p)}>
+                        Receta
+                      </button>
+                    )}
                     <button
                       className="ghost"
                       onClick={() =>
@@ -354,6 +375,7 @@ export default function Productos() {
                           stock: p.stock,
                           categoria_id: p.categoria_id ?? "",
                           imagen: p.imagen,
+                          tipo: p.tipo,
                         })
                       }
                     >
@@ -411,6 +433,16 @@ export default function Productos() {
                   </option>
                 ))}
               </select>
+              <select
+                value={editando.tipo}
+                onChange={(e) =>
+                  setEditando({ ...editando, tipo: e.target.value })
+                }
+              >
+                <option value="comprado">Comprado (se revende)</option>
+                <option value="preparado">Preparado (receta de insumos)</option>
+                <option value="compuesto">Compuesto (combo)</option>
+              </select>
               <label className="file-label">
                 <span className="material-symbols-outlined">image</span>
                 Cambiar imagen
@@ -433,6 +465,16 @@ export default function Productos() {
             {error && <p className="error">{error}</p>}
           </div>
         </div>
+      )}
+
+      {recetaDe && (
+        <RecetaModal
+          productoId={recetaDe.id}
+          productoNombre={recetaDe.nombre}
+          productoTipo={recetaDe.tipo}
+          onClose={() => setRecetaDe(null)}
+          onSaved={cargar}
+        />
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Bar,
   BarChart,
@@ -13,6 +14,12 @@ import { formatMoney, formatNumber } from "../lib/format";
 interface Resumen {
   total: number;
   num_ventas: number;
+}
+
+interface PizarraResumen {
+  pendientes: number;
+  tareas_pendientes: number;
+  notas: number;
 }
 
 interface TopProducto {
@@ -127,6 +134,7 @@ const ETIQUETA_RANGO: Record<Rango, string> = {
 export default function Dashboard() {
   const [resumenHoy, setResumenHoy] = useState<Resumen | null>(null);
   const [resumenMes, setResumenMes] = useState<Resumen | null>(null);
+  const [pizarra, setPizarra] = useState<PizarraResumen | null>(null);
   const [top, setTop] = useState<TopProducto[]>([]);
   const [rango, setRango] = useState<Rango>("dia");
   const [actividad, setActividad] = useState<PuntoPeriodo[]>([]);
@@ -137,7 +145,7 @@ export default function Dashboard() {
     const hastaHoy = finDia(now);
     const desdeMes = inicioMes(now);
     const { desde, hasta, agrupacion } = paramsActividad(rango);
-    const [rh, rm, tp, ac] = await Promise.allSettled([
+    const [rh, rm, tp, ac, pz] = await Promise.allSettled([
       api<Resumen>(`/reportes/resumen?desde=${desdeHoy}&hasta=${hastaHoy}`),
       api<Resumen>(`/reportes/resumen?desde=${desdeMes}&hasta=${hastaHoy}`),
       api<TopProducto[]>(
@@ -146,11 +154,13 @@ export default function Dashboard() {
       api<PuntoPeriodo[]>(
         `/reportes/actividad?desde=${desde}&hasta=${hasta}&agrupacion=${agrupacion}`
       ),
+      api<PizarraResumen>("/notas/resumen"),
     ]);
     if (rh.status === "fulfilled") setResumenHoy(rh.value);
     if (rm.status === "fulfilled") setResumenMes(rm.value);
     if (tp.status === "fulfilled") setTop(tp.value);
     if (ac.status === "fulfilled") setActividad(ac.value);
+    if (pz.status === "fulfilled") setPizarra(pz.value);
   }, [rango]);
 
   useEffect(() => {
@@ -163,7 +173,7 @@ export default function Dashboard() {
     );
     es.onmessage = (ev) => {
       const msg = JSON.parse(ev.data) as Evento;
-      if (EVENTOS_REFRESH.includes(msg.type)) {
+      if (EVENTOS_REFRESH.includes(msg.type) || msg.type.startsWith("nota_")) {
         cargarActividad();
       }
     };
@@ -190,6 +200,11 @@ export default function Dashboard() {
           <strong>{formatMoney(resumenMes?.total ?? 0)}</strong>
           <small>{resumenMes?.num_ventas ?? 0} ventas</small>
         </div>
+        <Link to="/pizarra" className="card card-link">
+          <span>Pizarra</span>
+          <strong>{pizarra?.pendientes ?? 0}</strong>
+          <small>{pizarra?.tareas_pendientes ?? 0} tareas pendientes</small>
+        </Link>
       </div>
 
       <div className="grid">

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from application.schemas.configuracion import LogoUpdate
+from application.schemas.configuracion import ConfiguracionUpdate, LogoUpdate
 from application.services.configuracion_service import ConfiguracionService
 from database import get_session
 from domain.entities.usuario import Usuario
@@ -28,3 +28,16 @@ def establecer_logo(
         "logo", body.logo
     )
     return {"logo": body.logo}
+
+
+@router.put("/{clave}")
+def establecer_valor(
+    clave: str,
+    body: ConfiguracionUpdate,
+    _: Usuario = Depends(require_admin),
+    db: Session = Depends(get_session),
+):
+    ConfiguracionService(SQLAlchemyConfiguracionRepository(db), db).establecer(
+        clave, body.valor
+    )
+    return {clave: body.valor}

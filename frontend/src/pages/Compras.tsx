@@ -14,17 +14,27 @@ interface Producto {
   nombre: string;
 }
 
-interface ItemCompra {
-  producto_id: string;
+interface Insumo {
+  id: string;
   nombre: string;
+  unidad: string;
+}
+
+interface ItemCompra {
+  tipo: "producto" | "insumo";
+  ref_id: string;
+  nombre: string;
+  unidad: string;
   cantidad: number;
   precio_unitario: number;
 }
 
 interface DetalleCompra {
   id: string;
-  producto_id: string;
-  nombre_producto: string;
+  tipo: string;
+  nombre: string;
+  nombre_producto?: string;
+  nombre_insumo?: string;
   cantidad: number;
   precio_unitario: number;
   subtotal: number;
@@ -43,11 +53,13 @@ export default function Compras() {
   const { user } = useAuth();
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [insumos, setInsumos] = useState<Insumo[]>([]);
   const [compras, setCompras] = useState<Compra[]>([]);
 
   const [proveedorId, setProveedorId] = useState("");
   const [items, setItems] = useState<ItemCompra[]>([]);
-  const [productoId, setProductoId] = useState("");
+  const [tipoLinea, setTipoLinea] = useState<"producto" | "insumo">("producto");
+  const [refId, setRefId] = useState("");
   const [cantidad, setCantidad] = useState("");
   const [precio, setPrecio] = useState(0);
 
@@ -56,13 +68,15 @@ export default function Compras() {
   const [error, setError] = useState("");
 
   async function cargar() {
-    const [provs, prods, comps] = await Promise.all([
+    const [provs, prods, ins, comps] = await Promise.all([
       api<Proveedor[]>("/proveedores"),
       api<Producto[]>("/productos"),
+      api<Insumo[]>("/insumos?solo_activos=true"),
       api<Compra[]>("/compras"),
     ]);
     setProveedores(provs);
     setProductos(prods);
+    setInsumos(ins);
     setCompras(comps);
   }
 
@@ -71,18 +85,37 @@ export default function Compras() {
   }, []);
 
   function agregarItem() {
-    const p = productos.find((x) => x.id === productoId);
-    if (!p || !cantidad) return;
-    setItems((prev) => [
-      ...prev,
-      {
-        producto_id: p.id,
-        nombre: p.nombre,
-        cantidad: Number(cantidad),
-        precio_unitario: precio,
-      },
-    ]);
-    setProductoId("");
+    if (!refId || !cantidad) return;
+    if (tipoLinea === "producto") {
+      const p = productos.find((x) => x.id === refId);
+      if (!p) return;
+      setItems((prev) => [
+        ...prev,
+        {
+          tipo: "producto",
+          ref_id: p.id,
+          nombre: p.nombre,
+          unidad: "",
+          cantidad: Number(cantidad),
+          precio_unitario: precio,
+        },
+      ]);
+    } else {
+      const i = insumos.find((x) => x.id === refId);
+      if (!i) return;
+      setItems((prev) => [
+        ...prev,
+        {
+          tipo: "insumo",
+          ref_id: i.id,
+          nombre: i.nombre,
+          unidad: i.unidad,
+          cantidad: Number(cantidad),
+          precio_unitario: precio,
+        },
+      ]);
+    }
+    setRefId("");
     setCantidad("");
     setPrecio(0);
   }
@@ -96,13 +129,15 @@ export default function Compras() {
         body: JSON.stringify({
           proveedor_id: proveedorId,
           items: items.map((i) => ({
-            producto_id: i.producto_id,
+            tipo: i.tipo,
+            producto_id: i.tipo === "producto" ? i.ref_id : null,
+            insumo_id: i.tipo === "insumo" ? i.ref_id : null,
             cantidad: i.cantidad,
             precio_unitario: i.precio_unitario,
           })),
         }),
       });
-      setMensaje("Compra registrada. El stock fue incrementado.");
+      setMensaje("Compra registrada.");
       setItems([]);
       setProveedorId("");
       await cargar();
@@ -112,7 +147,7 @@ export default function Compras() {
   }
 
   async function anular(id: string) {
-    if (!window.confirm("¿Anular esta compra? Se descontará el stock.")) return;
+    if (!window.confirm("¿Anular esta compra? Se revertirá el stock.")) return;
     setError("");
     try {
       await api(`/compras/${id}/anular`, { method: "POST" });
@@ -123,7 +158,10 @@ export default function Compras() {
   }
 
   async function eliminar(id: string) {
-    if (!window.confirm("¿Estás seguro de eliminar esta compra? Se descontará el stock.")) return;
+    if (
+      !window.confirm("¿Estás seguro de eliminar esta compra? Se revertirá el stock.")
+    )
+      return;
     setError("");
     try {
       await api(`/compras/${id}`, { method: "DELETE" });
@@ -136,6 +174,8 @@ export default function Compras() {
   const total = items.reduce((s, i) => s + i.cantidad * i.precio_unitario, 0);
   const nombreProveedor = (id: string) =>
     proveedores.find((p) => p.id === id)?.nombre ?? "—";
+  const nombreDetalle = (d: DetalleCompra) =>
+    d.nombre ?? d.nombre_producto ?? d.nombre_insumo ?? "—";
 
   return (
     <div>
@@ -160,20 +200,47 @@ export default function Compras() {
           </select>
         </label>
 
-        <div className="inline-form" style={{ marginTop: 10 }}>
-          <select
-            value={productoId}
-            onChange={(e) => setProductoId(e.target.value)}
+        <div className="chips" style={{ marginTop: 12 }}>
+          <button
+            className={tipoLinea === "producto" ? "chip active" : "chip"}
+            onClick={() => {
+              setTipoLinea("producto");
+              setRefId("");
+            }}
           >
-            <option value="">Producto...</option>
-            {productos.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nombre}
-              </option>
-            ))}
+            Producto terminado
+          </button>
+          <button
+            className={tipoLinea === "insumo" ? "chip active" : "chip"}
+            onClick={() => {
+              setTipoLinea("insumo");
+              setRefId("");
+            }}
+          >
+            Insumo (materia prima)
+          </button>
+        </div>
+
+        <div className="inline-form" style={{ marginTop: 10 }}>
+          <select value={refId} onChange={(e) => setRefId(e.target.value)}>
+            <option value="">
+              {tipoLinea === "producto" ? "Producto..." : "Insumo..."}
+            </option>
+            {tipoLinea === "producto"
+              ? productos.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.nombre}
+                  </option>
+                ))
+              : insumos.map((i) => (
+                  <option key={i.id} value={i.id}>
+                    {i.nombre} ({i.unidad})
+                  </option>
+                ))}
           </select>
           <input
             type="number"
+            step="any"
             placeholder="Cantidad"
             value={cantidad}
             onChange={(e) => setCantidad(e.target.value)}
@@ -192,7 +259,8 @@ export default function Compras() {
           <table style={{ marginTop: 12 }}>
             <thead>
               <tr>
-                <th>Producto</th>
+                <th>Tipo</th>
+                <th>Nombre</th>
                 <th>Cant.</th>
                 <th>Costo</th>
                 <th>Subtotal</th>
@@ -201,8 +269,10 @@ export default function Compras() {
             <tbody>
               {items.map((i, idx) => (
                 <tr key={idx}>
-                  <td data-label="Producto" className="cell-main">
+                  <td data-label="Tipo">{i.tipo}</td>
+                  <td data-label="Nombre" className="cell-main">
                     {i.nombre}
+                    {i.unidad ? ` (${i.unidad})` : ""}
                   </td>
                   <td data-label="Cant.">{i.cantidad}</td>
                   <td data-label="Costo">{formatMoney(i.precio_unitario)}</td>
@@ -243,48 +313,51 @@ export default function Compras() {
           <tbody>
             {compras.map((c) => (
               <Fragment key={c.id}>
-              <tr
-                className="venta-row"
-                onClick={() => setAbierta(abierta === c.id ? null : c.id)}
-              >
-                <td data-label="Fecha">
-                  {new Date(c.fecha).toLocaleString(undefined, {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </td>
-                <td data-label="Proveedor">{nombreProveedor(c.proveedor_id)}</td>
-                <td data-label="Total">{formatMoney(c.total)}</td>
-                <td data-label="Estado">
-                  <span className={c.anulada ? "pill off" : "pill on"}>
-                    {c.anulada ? "Anulada" : "Registrada"}
-                  </span>
-                </td>
-                {user?.rol === "admin" && (
-                  <td className="no-label" onClick={(e) => e.stopPropagation()}>
-                    <div className="actions">
-                      {!c.anulada && (
-                        <button className="ghost" onClick={() => anular(c.id)}>
-                          Anular
-                        </button>
-                      )}
-                      <button
-                        className="ghost danger"
-                        onClick={() => eliminar(c.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
+                <tr
+                  className="venta-row"
+                  onClick={() => setAbierta(abierta === c.id ? null : c.id)}
+                >
+                  <td data-label="Fecha">
+                    {new Date(c.fecha).toLocaleString(undefined, {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </td>
-                )}
-              </tr>
-              {abierta === c.id && (
-                <tr className="detalle-row">
-                  <td colSpan={user?.rol === "admin" ? 5 : 4}>
-                    <div className="detail-panel">
+                  <td data-label="Proveedor">{nombreProveedor(c.proveedor_id)}</td>
+                  <td data-label="Total">{formatMoney(c.total)}</td>
+                  <td data-label="Estado">
+                    <span className={c.anulada ? "pill off" : "pill on"}>
+                      {c.anulada ? "Anulada" : "Registrada"}
+                    </span>
+                  </td>
+                  {user?.rol === "admin" && (
+                    <td
+                      className="no-label"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="actions">
+                        {!c.anulada && (
+                          <button className="ghost" onClick={() => anular(c.id)}>
+                            Anular
+                          </button>
+                        )}
+                        <button
+                          className="ghost danger"
+                          onClick={() => eliminar(c.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+                {abierta === c.id && (
+                  <tr className="detalle-row">
+                    <td colSpan={user?.rol === "admin" ? 5 : 4}>
+                      <div className="detail-panel">
                         {c.detalles.map((d) => (
                           <div
                             key={d.id}
@@ -295,7 +368,7 @@ export default function Compras() {
                             }}
                           >
                             <span>
-                              {d.nombre_producto} × {d.cantidad}
+                              {nombreDetalle(d)} × {d.cantidad}
                             </span>
                             <span>{formatMoney(d.subtotal)}</span>
                           </div>

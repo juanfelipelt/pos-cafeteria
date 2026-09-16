@@ -1423,3 +1423,179 @@ button.danger:hover {
   font-size: 1.8rem;
   font-weight: 700;
 }
+
+/* ---------- Pizarra ---------- */
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.card-link:hover {
+  border-color: var(--border-strong);
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+}
+
+.note-add textarea {
+  width: 100%;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 1.4rem;
+  padding: 0.9rem 1rem;
+  border: 0.1rem solid var(--border-strong);
+  border-radius: 0.6rem;
+  color: var(--text);
+  background: #fff;
+}
+.note-add textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(55, 53, 47, 0.08);
+}
+.note-add-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+.note-add-bar .chips {
+  margin: 0;
+}
+.note-add-bar .primary {
+  margin-left: auto;
+}
+.note-add-bar select {
+  width: auto;
+}
+.chip.prio-chip {
+  background: #fdecea;
+  color: var(--danger);
+  border-color: #f3c4be;
+}
+
+.note-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.4rem 0 1.2rem;
+}
+.note-filtros .chips {
+  margin: 0;
+}
+.arch-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.6rem;
+  align-items: start;
+}
+
+.note-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem 1.1rem;
+  border: 0.1rem solid var(--border);
+  border-radius: 0.8rem;
+  margin-bottom: 0.8rem;
+  background: #fff;
+}
+.note-card.alta {
+  border-left: 0.3rem solid var(--danger);
+}
+.note-card.done .note-text {
+  text-decoration: line-through;
+  color: var(--text-faint);
+}
+.note-card.archivada {
+  opacity: 0.6;
+}
+
+.note-check {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-secondary);
+  line-height: 0;
+}
+.note-check .material-symbols-outlined,
+.note-actions .material-symbols-outlined {
+  font-size: 2rem;
+}
+.note-body {
+  flex: 1;
+  min-width: 0;
+}
+.note-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+.note-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  font-size: 1.15rem;
+  color: var(--text-faint);
+}
+.note-meta .prio {
+  background: #fdecea;
+  color: var(--danger);
+  padding: 0.1rem 0.6rem;
+  border-radius: 0.4rem;
+  font-weight: 600;
+}
+.note-meta .dest,
+.note-meta .tag-arch {
+  background: var(--hover);
+  color: var(--text-secondary);
+  padding: 0.1rem 0.6rem;
+  border-radius: 0.4rem;
+}
+.note-actions {
+  display: flex;
+  gap: 0.2rem;
+}
+.note-actions .small {
+  padding: 0.3rem;
+  line-height: 0;
+}
+.note-edit {
+  display: flex;
+  gap: 0.4rem;
+}
+.note-edit input {
+  flex: 1;
+}
+
+@media (max-width: 840px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+}

@@ -2,8 +2,10 @@ from pydantic import BaseModel
 
 
 class ItemCompra(BaseModel):
-    producto_id: str
-    cantidad: int
+    tipo: str = "producto"
+    producto_id: str | None = None
+    insumo_id: str | None = None
+    cantidad: float
     precio_unitario: float
 
 

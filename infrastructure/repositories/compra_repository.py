@@ -1,9 +1,11 @@
 from datetime import datetime
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from domain.entities.compra import Compra
 from domain.entities.detalle_compra import DetalleCompra
+from domain.entities.enums import TipoLineaCompra
 from domain.repositories.compra_repository import CompraRepository
 from infrastructure.models.compra import CompraModel
 from infrastructure.models.detalle_compra import DetalleCompraModel
@@ -13,8 +15,11 @@ def _to_entity(m: CompraModel) -> Compra:
     detalles = [
         DetalleCompra(
             id=d.id,
-            producto_id=d.producto_id,
-            nombre_producto=d.nombre_producto,
+            tipo=d.tipo,
+            producto_id=d.producto_id or None,
+            nombre_producto=d.nombre_producto or "",
+            insumo_id=d.insumo_id or None,
+            nombre_insumo=d.nombre_insumo or "",
             cantidad=d.cantidad,
             precio_unitario=d.precio_unitario,
         )
@@ -57,8 +62,11 @@ class SQLAlchemyCompraRepository(CompraRepository):
         m.detalles = [
             DetalleCompraModel(
                 id=d.id,
-                producto_id=d.producto_id,
-                nombre_producto=d.nombre_producto,
+                tipo=d.tipo,
+                producto_id=d.producto_id or "",
+                nombre_producto=d.nombre_producto or "",
+                insumo_id=d.insumo_id,
+                nombre_insumo=d.nombre_insumo or "",
                 cantidad=d.cantidad,
                 precio_unitario=d.precio_unitario,
             )
@@ -81,6 +89,56 @@ class SQLAlchemyCompraRepository(CompraRepository):
             .filter(CompraModel.proveedor_id == proveedor_id)
             .first()
             is not None
+        )
+
+    def _suma(
+        self,
+        tipo: str,
+        columna,
+        valor: str,
+        excluir_compra: str | None,
+    ) -> tuple[float, float]:
+        q = (
+            self.session.query(
+                func.coalesce(
+                    func.sum(
+                        DetalleCompraModel.cantidad
+                        * DetalleCompraModel.precio_unitario
+                    ),
+                    0.0,
+                ),
+                func.coalesce(func.sum(DetalleCompraModel.cantidad), 0.0),
+            )
+            .join(CompraModel, DetalleCompraModel.compra_id == CompraModel.id)
+            .filter(
+                DetalleCompraModel.tipo == tipo,
+                columna == valor,
+                CompraModel.anulada.is_(False),
+            )
+        )
+        if excluir_compra:
+            q = q.filter(CompraModel.id != excluir_compra)
+        total_valor, total_cantidad = q.one()
+        return float(total_valor or 0.0), float(total_cantidad or 0.0)
+
+    def suma_compras_insumo(
+        self, insumo_id: str, excluir_compra: str | None = None
+    ) -> tuple[float, float]:
+        return self._suma(
+            TipoLineaCompra.INSUMO.value,
+            DetalleCompraModel.insumo_id,
+            insumo_id,
+            excluir_compra,
+        )
+
+    def suma_compras_producto(
+        self, producto_id: str, excluir_compra: str | None = None
+    ) -> tuple[float, float]:
+        return self._suma(
+            TipoLineaCompra.PRODUCTO.value,
+            DetalleCompraModel.producto_id,
+            producto_id,
+            excluir_compra,
         )
 
     def delete(self, id: str) -> None:

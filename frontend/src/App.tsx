@@ -6,10 +6,13 @@ import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import POS from "./pages/POS";
+import Pizarra from "./pages/Pizarra";
 import Productos from "./pages/Productos";
 import Ventas from "./pages/Ventas";
 import Proveedores from "./pages/Proveedores";
 import Compras from "./pages/Compras";
+import Insumos from "./pages/Insumos";
+import Costeo from "./pages/Costeo";
 import Reportes from "./pages/Reportes";
 import Configuracion from "./pages/Configuracion";
 import Usuarios from "./pages/Usuarios";
@@ -30,10 +33,13 @@ export default function App() {
             >
               <Route path="/" element={<Dashboard />} />
               <Route path="/pos" element={<POS />} />
+              <Route path="/pizarra" element={<Pizarra />} />
               <Route path="/productos" element={<Productos />} />
               <Route path="/ventas" element={<Ventas />} />
               <Route path="/proveedores" element={<Proveedores />} />
               <Route path="/compras" element={<Compras />} />
+              <Route path="/insumos" element={<Insumos />} />
+              <Route path="/costeo" element={<Costeo />} />
               <Route path="/reportes" element={<Reportes />} />
               <Route path="/configuracion" element={<Configuracion />} />
               <Route path="/usuarios" element={<Usuarios />} />

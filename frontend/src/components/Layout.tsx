@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { api, eventSourceUrl, getToken } from "../api";
 import { useAuth } from "../auth";
 import { useConfig } from "../config";
 
@@ -15,20 +16,40 @@ export default function Layout() {
   const { logo } = useConfig();
   const location = useLocation();
   const [abierto, setAbierto] = useState(false);
+  const [pendientes, setPendientes] = useState(0);
 
   useEffect(() => {
     setAbierto(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    const refrescar = () =>
+      api<{ pendientes: number }>("/notas/resumen")
+        .then((r) => setPendientes(r.pendientes))
+        .catch(() => {});
+    refrescar();
+    const es = new EventSource(
+      eventSourceUrl(`/eventos/stream?token=${getToken() ?? ""}`)
+    );
+    es.onmessage = (ev) => {
+      const msg = JSON.parse(ev.data) as { type: string };
+      if (msg.type.startsWith("nota_")) refrescar();
+    };
+    return () => es.close();
+  }, []);
+
   const links: NavItem[] = [
     { to: "/", label: "Dashboard", icon: "space_dashboard", end: true },
     { to: "/pos", label: "Punto de venta", icon: "point_of_sale" },
+    { to: "/pizarra", label: "Pizarra", icon: "sticky_note_2" },
     { to: "/productos", label: "Productos", icon: "inventory_2" },
     { to: "/ventas", label: "Ventas", icon: "receipt_long" },
     { to: "/proveedores", label: "Proveedores", icon: "local_shipping" },
     { to: "/compras", label: "Compras", icon: "shopping_cart" },
   ];
   if (user?.rol === "admin") {
+    links.push({ to: "/insumos", label: "Insumos", icon: "grocery" });
+    links.push({ to: "/costeo", label: "Costeo", icon: "calculate" });
     links.push({ to: "/reportes", label: "Reportes", icon: "monitoring" });
     links.push({ to: "/usuarios", label: "Usuarios", icon: "group" });
     links.push({ to: "/configuracion", label: "Configuración", icon: "settings" });
@@ -59,6 +80,9 @@ export default function Layout() {
             >
               <span className="material-symbols-outlined">{l.icon}</span>
               {l.label}
+              {l.to === "/pizarra" && pendientes > 0 && (
+                <span className="nav-badge">{pendientes}</span>
+              )}
             </NavLink>
           ))}
         </nav>

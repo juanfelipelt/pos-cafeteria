@@ -9,6 +9,9 @@ from database import get_session
 from domain.entities.usuario import Usuario
 from infrastructure.api.dependencies import get_current_user, require_admin
 from infrastructure.repositories.compra_repository import SQLAlchemyCompraRepository
+from infrastructure.repositories.insumo_repository import (
+    SQLAlchemyInsumoRepository,
+)
 from infrastructure.repositories.producto_repository import (
     SQLAlchemyProductoRepository,
 )
@@ -18,7 +21,10 @@ router = APIRouter(prefix="/compras", tags=["compras"])
 
 def _build_service(db: Session) -> CompraService:
     return CompraService(
-        SQLAlchemyCompraRepository(db), SQLAlchemyProductoRepository(db), db
+        SQLAlchemyCompraRepository(db),
+        SQLAlchemyProductoRepository(db),
+        SQLAlchemyInsumoRepository(db),
+        db,
     )
 
 
@@ -30,7 +36,9 @@ def crear(
 ):
     items = [
         {
+            "tipo": i.tipo,
             "producto_id": i.producto_id,
+            "insumo_id": i.insumo_id,
             "cantidad": i.cantidad,
             "precio_unitario": i.precio_unitario,
         }

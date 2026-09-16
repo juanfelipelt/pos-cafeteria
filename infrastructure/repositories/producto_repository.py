@@ -16,6 +16,8 @@ def _to_entity(m: ProductoModel) -> Producto:
         precio=m.precio,
         stock=m.stock,
         estado=m.estado,
+        tipo=m.tipo,
+        costo=m.costo,
     )
 
 
@@ -53,6 +55,8 @@ class SQLAlchemyProductoRepository(ProductoRepository):
             precio=producto.precio,
             stock=producto.stock,
             estado=producto.estado,
+            tipo=producto.tipo,
+            costo=producto.costo,
         )
         self.session.add(m)
         self.session.flush()
@@ -67,5 +71,7 @@ class SQLAlchemyProductoRepository(ProductoRepository):
         m.precio = producto.precio
         m.stock = producto.stock
         m.estado = producto.estado
+        m.tipo = producto.tipo
+        m.costo = producto.costo
         self.session.flush()
         return producto

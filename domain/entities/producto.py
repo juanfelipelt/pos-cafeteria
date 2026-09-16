@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+from .enums import TipoProducto
+
+
 @dataclass
 class Producto:
     """Entidad de dominio para un producto."""
@@ -12,6 +15,8 @@ class Producto:
     precio: float = 0.0
     stock: int = 0
     estado: bool = True
+    tipo: str = TipoProducto.COMPRADO.value
+    costo: float = 0.0
 
     def __post_init__(self) -> None:
         if self.nombre is None or not self.nombre.strip():
@@ -22,6 +27,16 @@ class Producto:
 
         if self.stock < 0:
             raise ValueError("El stock del producto no puede ser negativo.")
+
+        if self.tipo not in (
+            TipoProducto.COMPRADO.value,
+            TipoProducto.PREPARADO.value,
+            TipoProducto.COMPUESTO.value,
+        ):
+            raise ValueError("El tipo de producto no es válido.")
+
+        if self.costo < 0:
+            raise ValueError("El costo del producto no puede ser negativo.")
 
     @property
     def esta_disponible(self) -> bool:
@@ -50,6 +65,20 @@ class Producto:
             raise ValueError("El nuevo stock no puede ser negativo.")
         self.stock = nuevo_stock
 
+    def cambiar_tipo(self, nuevo_tipo: str) -> None:
+        if nuevo_tipo not in (
+            TipoProducto.COMPRADO.value,
+            TipoProducto.PREPARADO.value,
+            TipoProducto.COMPUESTO.value,
+        ):
+            raise ValueError("El tipo de producto no es válido.")
+        self.tipo = nuevo_tipo
+
+    def cambiar_costo(self, nuevo_costo: float) -> None:
+        if nuevo_costo < 0:
+            raise ValueError("El costo no puede ser negativo.")
+        self.costo = nuevo_costo
+
     def desactivar(self) -> None:
         self.estado = False
 
@@ -66,4 +95,6 @@ class Producto:
             "precio": self.precio,
             "stock": self.stock,
             "estado": self.estado,
+            "tipo": self.tipo,
+            "costo": self.costo,
         }

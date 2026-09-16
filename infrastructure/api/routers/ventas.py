@@ -8,8 +8,14 @@ from application.services.venta_service import VentaService
 from database import get_session
 from domain.entities.usuario import Usuario
 from infrastructure.api.dependencies import get_current_user, require_admin
+from infrastructure.repositories.insumo_repository import (
+    SQLAlchemyInsumoRepository,
+)
 from infrastructure.repositories.producto_repository import (
     SQLAlchemyProductoRepository,
+)
+from infrastructure.repositories.receta_repository import (
+    SQLAlchemyRecetaRepository,
 )
 from infrastructure.repositories.venta_repository import SQLAlchemyVentaRepository
 
@@ -18,7 +24,11 @@ router = APIRouter(prefix="/ventas", tags=["ventas"])
 
 def _build_service(db: Session) -> VentaService:
     return VentaService(
-        SQLAlchemyVentaRepository(db), SQLAlchemyProductoRepository(db), db
+        SQLAlchemyVentaRepository(db),
+        SQLAlchemyProductoRepository(db),
+        SQLAlchemyInsumoRepository(db),
+        SQLAlchemyRecetaRepository(db),
+        db,
     )
 
 

@@ -19,6 +19,7 @@ def _to_entity(m: VentaModel) -> Venta:
             nombre_producto=d.nombre_producto,
             cantidad=d.cantidad,
             precio_unitario=d.precio_unitario,
+            costo_unitario=d.costo_unitario,
         )
         for d in m.detalles
     ]
@@ -76,6 +77,7 @@ class SQLAlchemyVentaRepository(VentaRepository):
                 nombre_producto=d.nombre_producto,
                 cantidad=d.cantidad,
                 precio_unitario=d.precio_unitario,
+                costo_unitario=d.costo_unitario,
             )
             for d in venta.detalles
         ]
