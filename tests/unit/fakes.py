@@ -78,6 +78,11 @@ class FakeCompraRepository(CompraRepository):
         self.data[compra.id] = compra
         return compra
 
+    def set_detalles(self, compra_id, detalles):
+        compra = self.data.get(compra_id)
+        if compra is not None:
+            compra.detalles = detalles
+
     def has_for_proveedor(self, proveedor_id: str):
         return any(c.proveedor_id == proveedor_id for c in self.data.values())
 

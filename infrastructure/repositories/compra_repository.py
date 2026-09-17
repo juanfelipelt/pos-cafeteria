@@ -83,6 +83,26 @@ class SQLAlchemyCompraRepository(CompraRepository):
         self.session.flush()
         return compra
 
+    def set_detalles(self, compra_id: str, detalles: list[DetalleCompra]) -> None:
+        self.session.query(DetalleCompraModel).filter(
+            DetalleCompraModel.compra_id == compra_id
+        ).delete(synchronize_session=False)
+        for d in detalles:
+            self.session.add(
+                DetalleCompraModel(
+                    id=d.id,
+                    compra_id=compra_id,
+                    tipo=d.tipo,
+                    producto_id=d.producto_id or "",
+                    nombre_producto=d.nombre_producto or "",
+                    insumo_id=d.insumo_id,
+                    nombre_insumo=d.nombre_insumo or "",
+                    cantidad=d.cantidad,
+                    precio_unitario=d.precio_unitario,
+                )
+            )
+        self.session.flush()
+
     def has_for_proveedor(self, proveedor_id: str) -> bool:
         return (
             self.session.query(CompraModel)

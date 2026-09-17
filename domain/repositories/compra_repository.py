@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 from domain.entities.compra import Compra
+from domain.entities.detalle_compra import DetalleCompra
 
 
 class CompraRepository(ABC):
@@ -19,6 +20,13 @@ class CompraRepository(ABC):
 
     @abstractmethod
     def update(self, compra: Compra) -> Compra:
+        ...
+
+    @abstractmethod
+    def set_detalles(
+        self, compra_id: str, detalles: list[DetalleCompra]
+    ) -> None:
+        """Reemplaza las líneas de una compra existente."""
         ...
 
     @abstractmethod

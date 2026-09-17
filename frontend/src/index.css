@@ -1599,3 +1599,8 @@ button.danger:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Compras: edición de líneas ---------- */
+.qty-input {
+  width: 8rem;
+}

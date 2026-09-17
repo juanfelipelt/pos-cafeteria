@@ -32,10 +32,9 @@ class CompraService:
         self.insumos = insumos
         self.session = session
 
-    def crear(self, proveedor_id: str, items: list[dict]) -> Compra:
-        if not items:
-            raise ValidationError("La compra debe tener al menos una línea.")
-
+    def _aplicar_items(self, items: list[dict]) -> list[DetalleCompra]:
+        """Aplica cada línea (sube stock y recalcula costo) y devuelve los
+        detalles de dominio."""
         detalles: list[DetalleCompra] = []
         for item in items:
             tipo = item.get("tipo", TipoLineaCompra.PRODUCTO.value)
@@ -82,11 +81,39 @@ class CompraService:
                         precio_unitario=precio_unitario,
                     )
                 )
+        return detalles
 
+    def crear(self, proveedor_id: str, items: list[dict]) -> Compra:
+        if not items:
+            raise ValidationError("La compra debe tener al menos una línea.")
+
+        detalles = self._aplicar_items(items)
         compra = Compra(id=new_id(), proveedor_id=proveedor_id, detalles=detalles)
         self.compras.add(compra)
         self.session.commit()
         return compra
+
+    def actualizar(
+        self, compra_id: str, proveedor_id: str, items: list[dict]
+    ) -> Compra:
+        if not items:
+            raise ValidationError("La compra debe tener al menos una línea.")
+
+        compra = self.obtener(compra_id)
+        if compra.anulada:
+            raise ValidationError("No se puede editar una compra anulada.")
+
+        # Revertir el efecto de las líneas actuales y aplicar las nuevas.
+        self._revertir_stock(compra)
+        compra.proveedor_id = proveedor_id
+        nuevos = self._aplicar_items(items)
+
+        self.compras.update(compra)
+        self.compras.set_detalles(compra.id, nuevos)
+        compra.detalles = nuevos
+        self.session.commit()
+        return compra
+
 
     def listar(self, desde=None, hasta=None) -> list[Compra]:
         return self.compras.list(desde, hasta)

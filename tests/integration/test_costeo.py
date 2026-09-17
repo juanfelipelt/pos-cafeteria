@@ -110,13 +110,15 @@ class TestReceta:
 
 
 class TestCompraInsumo:
-    def test_promedio_ponderado(self, client, admin_headers):
-        r = client.post(
+    def _proveedor(self, client, headers):
+        return client.post(
             "/proveedores",
             json={"nombre": "Prov", "contacto": "X", "telefono": "1"},
-            headers=admin_headers,
-        )
-        prov = r.json()
+            headers=headers,
+        ).json()
+
+    def test_promedio_ponderado(self, client, admin_headers):
+        prov = self._proveedor(client, admin_headers)
         insumo = _create_insumo(client, admin_headers, stock=100, costo=2.0)
 
         r = client.post(
@@ -139,6 +141,104 @@ class TestCompraInsumo:
         r = client.get(f"/insumos/{insumo['id']}", headers=admin_headers)
         assert r.json()["stock"] == 200
         assert r.json()["costo_unitario"] == 3.0
+
+    def test_editar_compra_ajusta_stock_y_costo(self, client, admin_headers):
+        prov = self._proveedor(client, admin_headers)
+        insumo = _create_insumo(
+            client, admin_headers, stock=0, costo=0
+        )
+        client.post(
+            "/compras",
+            json={
+                "proveedor_id": prov["id"],
+                "items": [
+                    {"tipo": "insumo", "insumo_id": insumo["id"], "cantidad": 100, "precio_unitario": 2.0}
+                ],
+            },
+            headers=admin_headers,
+        )
+        r = client.post(
+            "/compras",
+            json={
+                "proveedor_id": prov["id"],
+                "items": [
+                    {"tipo": "insumo", "insumo_id": insumo["id"], "cantidad": 100, "precio_unitario": 4.0}
+                ],
+            },
+            headers=admin_headers,
+        )
+        compra_b = r.json()
+
+        # Editar la 2ª compra: 100 @ 10
+        r = client.put(
+            f"/compras/{compra_b['id']}",
+            json={
+                "proveedor_id": prov["id"],
+                "items": [
+                    {"tipo": "insumo", "insumo_id": insumo["id"], "cantidad": 100, "precio_unitario": 10.0}
+                ],
+            },
+            headers=admin_headers,
+        )
+        assert r.status_code == 200, r.text
+
+        ins = client.get(f"/insumos/{insumo['id']}", headers=admin_headers).json()
+        assert ins["stock"] == 200
+        # (100×2 + 100×10) / 200 = 6.0
+        assert ins["costo_unitario"] == 6.0
+
+    def test_editar_compra_requiere_admin(self, client, admin_headers, cajero_headers):
+        prov = self._proveedor(client, admin_headers)
+        insumo = _create_insumo(client, admin_headers, stock=0, costo=0)
+        compra = client.post(
+            "/compras",
+            json={
+                "proveedor_id": prov["id"],
+                "items": [
+                    {"tipo": "insumo", "insumo_id": insumo["id"], "cantidad": 10, "precio_unitario": 1.0}
+                ],
+            },
+            headers=admin_headers,
+        ).json()
+
+        r = client.put(
+            f"/compras/{compra['id']}",
+            json={
+                "proveedor_id": prov["id"],
+                "items": [
+                    {"tipo": "insumo", "insumo_id": insumo["id"], "cantidad": 20, "precio_unitario": 1.0}
+                ],
+            },
+            headers=cajero_headers,
+        )
+        assert r.status_code == 403
+
+    def test_editar_compra_anulada(self, client, admin_headers):
+        prov = self._proveedor(client, admin_headers)
+        insumo = _create_insumo(client, admin_headers, stock=0, costo=0)
+        compra = client.post(
+            "/compras",
+            json={
+                "proveedor_id": prov["id"],
+                "items": [
+                    {"tipo": "insumo", "insumo_id": insumo["id"], "cantidad": 10, "precio_unitario": 1.0}
+                ],
+            },
+            headers=admin_headers,
+        ).json()
+        client.post(f"/compras/{compra['id']}/anular", headers=admin_headers)
+
+        r = client.put(
+            f"/compras/{compra['id']}",
+            json={
+                "proveedor_id": prov["id"],
+                "items": [
+                    {"tipo": "insumo", "insumo_id": insumo["id"], "cantidad": 20, "precio_unitario": 1.0}
+                ],
+            },
+            headers=admin_headers,
+        )
+        assert r.status_code == 422
 
 
 class TestCostosFijos:

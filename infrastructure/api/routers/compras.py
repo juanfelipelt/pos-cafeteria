@@ -66,6 +66,28 @@ def obtener(
     return _build_service(db).obtener(compra_id).to_dict()
 
 
+@router.put("/{compra_id}")
+def actualizar(
+    compra_id: str,
+    body: CompraCreate,
+    _=Depends(require_admin),
+    db: Session = Depends(get_session),
+):
+    items = [
+        {
+            "tipo": i.tipo,
+            "producto_id": i.producto_id,
+            "insumo_id": i.insumo_id,
+            "cantidad": i.cantidad,
+            "precio_unitario": i.precio_unitario,
+        }
+        for i in body.items
+    ]
+    return _build_service(db).actualizar(
+        compra_id, body.proveedor_id, items
+    ).to_dict()
+
+
 @router.post("/{compra_id}/anular")
 def anular(
     compra_id: str,

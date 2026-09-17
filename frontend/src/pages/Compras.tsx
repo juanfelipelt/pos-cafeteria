@@ -35,6 +35,8 @@ interface DetalleCompra {
   nombre: string;
   nombre_producto?: string;
   nombre_insumo?: string;
+  producto_id?: string | null;
+  insumo_id?: string | null;
   cantidad: number;
   precio_unitario: number;
   subtotal: number;
@@ -64,6 +66,7 @@ export default function Compras() {
   const [precio, setPrecio] = useState(0);
 
   const [abierta, setAbierta] = useState<string | null>(null);
+  const [editandoCompraId, setEditandoCompraId] = useState<string | null>(null);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
 
@@ -120,26 +123,86 @@ export default function Compras() {
     setPrecio(0);
   }
 
+  function actualizarItem(
+    idx: number,
+    campo: "cantidad" | "precio_unitario",
+    valor: number
+  ) {
+    setItems((prev) =>
+      prev.map((it, i) => (i === idx ? { ...it, [campo]: valor } : it))
+    );
+  }
+
+  function quitarItem(idx: number) {
+    setItems((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  function editarCompra(c: Compra) {
+    setEditandoCompraId(c.id);
+    setProveedorId(c.proveedor_id);
+    setItems(
+      c.detalles.map((d) => {
+        const tipo = d.tipo === "insumo" ? "insumo" : "producto";
+        const ref_id =
+          tipo === "insumo" ? d.insumo_id ?? "" : d.producto_id ?? "";
+        const nombre =
+          d.nombre || d.nombre_producto || d.nombre_insumo || "—";
+        const unidad =
+          tipo === "insumo"
+            ? insumos.find((i) => i.id === d.insumo_id)?.unidad ?? ""
+            : "";
+        return {
+          tipo,
+          ref_id,
+          nombre,
+          unidad,
+          cantidad: d.cantidad,
+          precio_unitario: d.precio_unitario,
+        };
+      })
+    );
+    setMensaje("");
+    setError("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function cancelarEdicion() {
+    setEditandoCompraId(null);
+    setItems([]);
+    setProveedorId("");
+    setMensaje("");
+  }
+
   async function guardar() {
     setError("");
     setMensaje("");
+    const payload = {
+      proveedor_id: proveedorId,
+      items: items.map((i) => ({
+        tipo: i.tipo,
+        producto_id: i.tipo === "producto" ? i.ref_id : null,
+        insumo_id: i.tipo === "insumo" ? i.ref_id : null,
+        cantidad: i.cantidad,
+        precio_unitario: i.precio_unitario,
+      })),
+    };
     try {
-      await api("/compras", {
-        method: "POST",
-        body: JSON.stringify({
-          proveedor_id: proveedorId,
-          items: items.map((i) => ({
-            tipo: i.tipo,
-            producto_id: i.tipo === "producto" ? i.ref_id : null,
-            insumo_id: i.tipo === "insumo" ? i.ref_id : null,
-            cantidad: i.cantidad,
-            precio_unitario: i.precio_unitario,
-          })),
-        }),
-      });
-      setMensaje("Compra registrada.");
+      if (editandoCompraId) {
+        await api(`/compras/${editandoCompraId}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
+        setMensaje("Compra actualizada.");
+      } else {
+        await api("/compras", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        setMensaje("Compra registrada.");
+      }
       setItems([]);
       setProveedorId("");
+      setEditandoCompraId(null);
       await cargar();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");
@@ -184,7 +247,7 @@ export default function Compras() {
       {error && <p className="error">{error}</p>}
 
       <section className="card">
-        <h3>Registrar compra</h3>
+        <h3>{editandoCompraId ? "Editar compra" : "Registrar compra"}</h3>
         <label>
           Proveedor
           <select
@@ -264,6 +327,7 @@ export default function Compras() {
                 <th>Cant.</th>
                 <th>Costo</th>
                 <th>Subtotal</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -274,10 +338,33 @@ export default function Compras() {
                     {i.nombre}
                     {i.unidad ? ` (${i.unidad})` : ""}
                   </td>
-                  <td data-label="Cant.">{i.cantidad}</td>
-                  <td data-label="Costo">{formatMoney(i.precio_unitario)}</td>
+                  <td data-label="Cant.">
+                    <input
+                      type="number"
+                      step="any"
+                      className="qty-input"
+                      value={i.cantidad}
+                      onChange={(e) =>
+                        actualizarItem(idx, "cantidad", Number(e.target.value))
+                      }
+                    />
+                  </td>
+                  <td data-label="Costo">
+                    <MoneyInput
+                      value={i.precio_unitario}
+                      onChange={(v) => actualizarItem(idx, "precio_unitario", v)}
+                    />
+                  </td>
                   <td data-label="Subtotal">
                     {formatMoney(i.cantidad * i.precio_unitario)}
+                  </td>
+                  <td className="no-label">
+                    <button
+                      className="ghost danger"
+                      onClick={() => quitarItem(idx)}
+                    >
+                      Quitar
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -287,13 +374,20 @@ export default function Compras() {
 
         <div className="total">{formatMoney(total)}</div>
 
-        <button
-          className="primary"
-          disabled={!proveedorId || items.length === 0}
-          onClick={guardar}
-        >
-          Guardar compra
-        </button>
+        <div className="inline-form" style={{ marginTop: 4 }}>
+          <button
+            className="primary"
+            disabled={!proveedorId || items.length === 0}
+            onClick={guardar}
+          >
+            {editandoCompraId ? "Guardar cambios" : "Guardar compra"}
+          </button>
+          {editandoCompraId && (
+            <button className="ghost" onClick={cancelarEdicion}>
+              Cancelar
+            </button>
+          )}
+        </div>
         {mensaje && <p className="ok">{mensaje}</p>}
         {error && <p className="error">{error}</p>}
       </section>
@@ -340,9 +434,20 @@ export default function Compras() {
                     >
                       <div className="actions">
                         {!c.anulada && (
-                          <button className="ghost" onClick={() => anular(c.id)}>
-                            Anular
-                          </button>
+                          <>
+                            <button
+                              className="ghost"
+                              onClick={() => editarCompra(c)}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="ghost"
+                              onClick={() => anular(c.id)}
+                            >
+                              Anular
+                            </button>
+                          </>
                         )}
                         <button
                           className="ghost danger"
