@@ -13,6 +13,13 @@ from domain.repositories.producto_repository import ProductoRepository
 def _promedio_ponderado(
     stock_actual: float, costo_actual: float, cantidad: float, precio: float
 ) -> float:
+    """Costo promedio ponderado.
+
+    Si el inventario actual no tiene costo (stock manual con costo 0) o no hay
+    stock, no se diluye: el costo pasa a ser el precio de esta compra.
+    """
+    if stock_actual <= 0 or costo_actual <= 0:
+        return precio
     total = stock_actual + cantidad
     if total <= 0:
         return precio

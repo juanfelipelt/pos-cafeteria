@@ -345,6 +345,44 @@ class TestCosteoResumen:
         assert r.json()["stock"] == 994.0  # 1000 - 2*3
 
 
+class TestCostoProductoComprado:
+    def test_costo_no_se_diluye_con_stock_sin_costo(self, client, admin_headers):
+        prov = client.post(
+            "/proveedores",
+            json={"nombre": "Prov", "contacto": "X", "telefono": "1"},
+            headers=admin_headers,
+        ).json()
+        producto = client.post(
+            "/productos",
+            json={"nombre": "Agua", "precio": 3000, "stock": 1, "tipo": "comprado"},
+            headers=admin_headers,
+        ).json()
+
+        client.post(
+            "/compras",
+            json={
+                "proveedor_id": prov["id"],
+                "items": [
+                    {
+                        "tipo": "producto",
+                        "producto_id": producto["id"],
+                        "cantidad": 1,
+                        "precio_unitario": 1200,
+                    }
+                ],
+            },
+            headers=admin_headers,
+        )
+
+        p = client.get(f"/productos/{producto['id']}", headers=admin_headers).json()
+        assert p["costo"] == 1200.0
+
+        r = client.get("/costeo/productos", headers=admin_headers)
+        fila = next(f for f in r.json() if f["producto_id"] == producto["id"])
+        assert fila["costo"] == 1200.0
+        assert fila["margen"] == 1800.0
+
+
 class TestProductoCompuesto:
     def _proveedor(self, client, headers):
         return client.post(
