@@ -1,0 +1,80 @@
+/* Estilos del módulo de productos de Cafetería POS */
+:root {
+    --azul: #14263b;
+    --verde: #1f7a6b;
+    --gris: #5a6b7b;
+    --claro: #f4f7fa;
+    --borde: #d9e2ea;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #22303c;
+    background: var(--claro);
+}
+
+.cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--azul);
+    color: #fff;
+    padding: 18px 32px;
+}
+
+.cabecera h1 { font-size: 22px; margin: 0; }
+.cabecera h1 span { font-weight: 400; color: #bfd4e6; }
+
+.contenedor {
+    max-width: 960px;
+    margin: 32px auto;
+    background: #fff;
+    padding: 28px 32px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(20, 38, 59, .08);
+}
+
+.tabla { width: 100%; border-collapse: collapse; }
+.tabla th, .tabla td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--borde); }
+.tabla th { color: var(--azul); font-size: 14px; text-transform: uppercase; letter-spacing: .03em; }
+.tabla tr:hover td { background: #f8fbfd; }
+
+.acciones a { margin-right: 12px; color: var(--verde); text-decoration: none; }
+.acciones a.eliminar { color: #d9694f; }
+.acciones a:hover { text-decoration: underline; }
+
+.etiqueta { padding: 3px 10px; border-radius: 999px; font-size: 13px; }
+.etiqueta.activo { background: #e8f4f0; color: var(--verde); }
+.etiqueta.inactivo { background: #fbeceb; color: #d9694f; }
+
+.vacio { color: var(--gris); }
+h2 { color: var(--azul); margin-top: 0; }
+
+.formulario { display: grid; gap: 18px; max-width: 520px; }
+.formulario label { display: grid; gap: 6px; font-weight: 600; color: var(--azul); }
+.formulario input[type="text"],
+.formulario input[type="number"] {
+    padding: 10px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    font-size: 15px;
+}
+.formulario .check { display: flex; align-items: center; gap: 10px; font-weight: 400; }
+.botones { display: flex; gap: 12px; }
+
+.boton {
+    display: inline-block;
+    background: var(--verde);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+}
+.boton:hover { filter: brightness(1.05); }
+.boton.secundario { background: #eef2f6; color: var(--azul); }

@@ -1,4 +1,12 @@
+"""Repositorio SQLAlchemy para los productos.
+
+Implementa `ProductoRepository` del dominio sobre la tabla `productos`.
+Permite buscar, filtrar (por nombre, categoría y estado) y administrar
+productos del catálogo.
+"""
+
 from __future__ import annotations
+# `func` para ordenar alfabéticamente sin distinguir mayúsculas.
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -8,6 +16,7 @@ from infrastructure.models.producto import ProductoModel
 
 
 def _to_entity(m: ProductoModel) -> Producto:
+    """Convierte un modelo ORM `ProductoModel` en la entidad `Producto`."""
     return Producto(
         id=m.id,
         nombre=m.nombre,
@@ -23,10 +32,13 @@ def _to_entity(m: ProductoModel) -> Producto:
 
 
 class SQLAlchemyProductoRepository(ProductoRepository):
+    """Implementación concreta de `ProductoRepository` con SQLAlchemy."""
+
     def __init__(self, session: Session) -> None:
         self.session = session
 
     def get(self, id: str) -> Producto | None:
+        """Busca un producto por id. None si no existe."""
         m = self.session.get(ProductoModel, id)
         return _to_entity(m) if m else None
 
@@ -36,17 +48,26 @@ class SQLAlchemyProductoRepository(ProductoRepository):
         categoria_id: str | None = None,
         solo_activos: bool = False,
     ) -> list[Producto]:
+        """Lista productos con filtros opcionales.
+
+        - `filtro`: texto que debe aparecer en el nombre.
+        - `categoria_id`: solo productos de esa categoría.
+        - `solo_activos`: si es True, solo productos activos.
+        """
         q = self.session.query(ProductoModel)
         if filtro:
+            # Búsqueda parcial por nombre, sin importar mayúsculas.
             q = q.filter(ProductoModel.nombre.ilike(f"%{filtro}%"))
         if categoria_id:
             q = q.filter(ProductoModel.categoria_id == categoria_id)
         if solo_activos:
             q = q.filter(ProductoModel.estado.is_(True))
+        # Orden alfabético estable (minúscula y luego el nombre original).
         q = q.order_by(func.lower(ProductoModel.nombre).asc(), ProductoModel.nombre.asc())
         return [_to_entity(m) for m in q.all()]
 
     def add(self, producto: Producto) -> Producto:
+        """Registra un nuevo producto."""
         m = ProductoModel(
             id=producto.id,
             nombre=producto.nombre,
@@ -64,6 +85,7 @@ class SQLAlchemyProductoRepository(ProductoRepository):
         return producto
 
     def update(self, producto: Producto) -> Producto:
+        """Actualiza un producto existente con los datos de la entidad."""
         m = self.session.get(ProductoModel, producto.id)
         m.nombre = producto.nombre
         m.descripcion = producto.descripcion

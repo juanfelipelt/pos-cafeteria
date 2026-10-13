@@ -1,4 +1,11 @@
+"""Repositorio SQLAlchemy para los proveedores.
+
+Implementa `ProveedorRepository` del dominio sobre la tabla `proveedores`.
+Permite buscar, filtrar por nombre y estado, y administrar proveedores.
+"""
+
 from __future__ import annotations
+# `func` para ordenar alfabéticamente sin distinguir mayúsculas.
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -8,6 +15,7 @@ from infrastructure.models.proveedor import ProveedorModel
 
 
 def _to_entity(m: ProveedorModel) -> Proveedor:
+    """Convierte un modelo ORM `ProveedorModel` en la entidad `Proveedor`."""
     return Proveedor(
         id=m.id,
         nombre=m.nombre,
@@ -22,25 +30,36 @@ def _to_entity(m: ProveedorModel) -> Proveedor:
 
 
 class SQLAlchemyProveedorRepository(ProveedorRepository):
+    """Implementación concreta de `ProveedorRepository` con SQLAlchemy."""
+
     def __init__(self, session: Session) -> None:
         self.session = session
 
     def get(self, id: str) -> Proveedor | None:
+        """Busca un proveedor por id. None si no existe."""
         m = self.session.get(ProveedorModel, id)
         return _to_entity(m) if m else None
 
     def list(
         self, filtro: str | None = None, solo_activos: bool = False
     ) -> list[Proveedor]:
+        """Lista proveedores con filtros opcionales.
+
+        - `filtro`: texto que debe aparecer en el nombre.
+        - `solo_activos`: si es True, solo proveedores activos.
+        """
         q = self.session.query(ProveedorModel)
         if filtro:
+            # Búsqueda parcial por nombre, sin importar mayúsculas.
             q = q.filter(ProveedorModel.nombre.ilike(f"%{filtro}%"))
         if solo_activos:
             q = q.filter(ProveedorModel.estado.is_(True))
+        # Orden alfabético estable (minúscula y luego el nombre original).
         q = q.order_by(func.lower(ProveedorModel.nombre).asc(), ProveedorModel.nombre.asc())
         return [_to_entity(m) for m in q.all()]
 
     def add(self, proveedor: Proveedor) -> Proveedor:
+        """Registra un nuevo proveedor."""
         m = ProveedorModel(
             id=proveedor.id,
             nombre=proveedor.nombre,
@@ -57,6 +76,7 @@ class SQLAlchemyProveedorRepository(ProveedorRepository):
         return proveedor
 
     def update(self, proveedor: Proveedor) -> Proveedor:
+        """Actualiza un proveedor existente con los datos de la entidad."""
         m = self.session.get(ProveedorModel, proveedor.id)
         m.nombre = proveedor.nombre
         m.contacto = proveedor.contacto
@@ -70,6 +90,7 @@ class SQLAlchemyProveedorRepository(ProveedorRepository):
         return proveedor
 
     def delete(self, id: str) -> None:
+        """Elimina un proveedor si existe."""
         m = self.session.get(ProveedorModel, id)
         if m is not None:
             self.session.delete(m)

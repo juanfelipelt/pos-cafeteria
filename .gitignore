@@ -1,27 +1,20 @@
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
-.pytest_cache/
 .venv/
 venv/
 *.db
-*.sqlite
-*.sqlite3
+*.sqlite*
 .env
 .env.*
-
 # Node / frontend
 node_modules/
 dist/
 dist-ssr/
-*.local
-
+# Java
+target/
+*.class
 # IDE / OS
 .vscode/
 .idea/
 .DS_Store
-*.sw?
-
-# opencode (tooling local)
-.opencode/

@@ -1,3 +1,27 @@
+/*
+ * index.css — Hoja de estilos global de la aplicación Cafetería POS.
+ *
+ * ¿Qué es? El único archivo CSS global. Define la apariencia (colores,
+ * tipografía, espaciados) de TODA la interfaz: sidebar, botones, tablas,
+ * tarjetas, el punto de venta (POS), el login, etc.
+ *
+ * ¿Para qué sirve?
+ *   - Declarar "variables" (custom properties) reutilizables de color y medida.
+ *   - Establecer estilos base (reset, tipografía, tamaño rem).
+ *   - Definir clases reutilizables por los componentes de React.
+ *   - Adaptar el diseño a pantallas pequeñas con @media (responsive).
+ *
+ * ¿Cómo se relaciona con el resto de la app?
+ *   main.tsx importa este archivo, por lo que todos los componentes usan
+ *   estas clases (className="card", "sidebar", etc.). Se complementa con
+ *   estilos en línea puntuales dentro de cada página.
+ */
+
+/* ==========================================================================
+   1) VARIABLES GLOBALES (:root)
+   Se definen una sola vez y se reutilizan con var(--nombre). Cambiar una
+   variable aquí cambia el color/medida en toda la aplicación.
+   ========================================================================== */
 :root {
   --bg: #ffffff;
   --bg-muted: #f7f7f5;
@@ -17,6 +41,11 @@
     "Helvetica Neue", Arial, sans-serif;
 }
 
+/* ==========================================================================
+   2) RESET Y ESTILOS BASE
+   box-sizing: border-box hace que el padding y el borde cuenten dentro del
+   ancho/alto, evitando que los elementos se desborden.
+   ========================================================================== */
 *,
 *::before,
 *::after {
@@ -36,12 +65,16 @@ html {
   font-size: 62.5%;
 }
 
+/* En pantallas grandes (>= 1100px) subimos un poco el tamaño base para
+   aprovechar mejor el espacio del PC. */
 @media (min-width: 1100px) {
   html {
     font-size: 78.125%;
   }
 }
 
+/* html, body y #root ocupan toda la altura de la ventana para que los
+   layouts a pantalla completa funcionen. */
 html,
 body,
 #root {
@@ -52,17 +85,21 @@ body {
   font-family: var(--font);
   color: var(--text);
   background: var(--bg);
+  /* Suaviza el renderizado de la tipografía en navegadores webkit. */
   -webkit-font-smoothing: antialiased;
   font-size: 1.4rem;
   line-height: 1.5;
 }
 
+/* Contenedor general de la app: sidebar a la izquierda y contenido a la
+   derecha, ocupando al menos toda la altura de la pantalla. */
 .app {
   display: flex;
   min-height: 100vh;
 }
 
 /* ---------- Sidebar ---------- */
+/* Menú lateral fijo con la navegación principal. */
 .sidebar {
   width: 23.2rem;
   flex-shrink: 0;
@@ -183,18 +220,22 @@ body {
 }
 
 /* ---------- Main ---------- */
+/* Área principal de contenido, a la derecha del sidebar. */
 .main {
   flex: 1;
   min-width: 0;
   padding: 2.8rem 4rem 6rem;
 }
 
+/* Contenedor de cada página: ancho máximo centrado y ligera animación de
+   entrada. */
 .page {
   max-width: 98rem;
   margin: 0 auto;
   animation: fadeUp 0.3s ease;
 }
 
+/* Animación de "aparecer subiendo" usada por páginas y tarjetas. */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -220,6 +261,7 @@ h3 {
 }
 
 /* ---------- Cards ---------- */
+/* Tarjeta blanca con borde suave y sombra: bloque visual reutilizable. */
 .card {
   background: var(--bg);
   border: 0.1rem solid var(--border);
@@ -230,6 +272,7 @@ h3 {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
+/* Fila de tarjetas (por ejemplo los indicadores del dashboard). */
 .cards {
   display: flex;
   gap: 1.6rem;
@@ -298,6 +341,7 @@ h3 {
 }
 
 /* ---------- Forms ---------- */
+/* Estilo unificado de los campos de entrada y listas desplegables. */
 input,
 select {
   padding: 0.7rem 1rem;
@@ -337,6 +381,7 @@ label {
 }
 
 /* ---------- Buttons ---------- */
+/* Botón base (color de acento) y sus variantes. */
 button {
   border: 0.1rem solid transparent;
   background: var(--accent);
@@ -384,6 +429,8 @@ button.small {
 }
 
 /* ---------- Table ---------- */
+/* Tablas de datos con cabeceras en mayúsculas y filas que se resaltan al
+   pasar el ratón. */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -415,6 +462,7 @@ tbody tr:hover {
 }
 
 /* ---------- POS ---------- */
+/* Distribución del punto de venta en dos columnas: productos | carrito. */
 .pos {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -427,6 +475,7 @@ tbody tr:hover {
   }
 }
 
+/* Lista de productos disponibles en el POS (con scroll si es larga). */
 .product-list {
   list-style: none;
   padding: 0;
@@ -470,6 +519,7 @@ tbody tr:hover {
 }
 
 /* ---------- Login ---------- */
+/* Pantalla de inicio de sesión: fondo gris y tarjeta centrada. */
 .login {
   min-height: 100vh;
   display: flex;
@@ -515,6 +565,7 @@ tbody tr:hover {
 }
 
 /* ---------- Misc ---------- */
+/* Clases de utilidad: texto atenuado, mensajes de error/éxito, etc. */
 .muted {
   color: var(--text-secondary);
 }
@@ -570,6 +621,7 @@ tbody tr:hover {
 }
 
 /* ---------- Configuración ---------- */
+/* Editor del logo: previsualización y botones para cambiarlo. */
 .logo-editor {
   display: flex;
   gap: 2rem;
@@ -611,6 +663,7 @@ tbody tr:hover {
 }
 
 /* ---------- Material Symbols ---------- */
+/* Ajustes base de la fuente de iconos "Material Symbols". */
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
   font-weight: normal;
@@ -629,6 +682,7 @@ tbody tr:hover {
 }
 
 /* ---------- Chips (filtro de categorías) ---------- */
+/* Botones tipo "píldora" que sirven para filtrar por categoría. */
 .chips {
   display: flex;
   gap: 0.8rem;
@@ -636,6 +690,7 @@ tbody tr:hover {
   margin-bottom: 1.6rem;
 }
 
+/* Chip individual; .active marca el seleccionado. */
 .chip {
   padding: 0.5rem 1.2rem;
   border-radius: 99.9rem;
@@ -659,12 +714,15 @@ tbody tr:hover {
 }
 
 /* ---------- Grid de productos ---------- */
+/* Rejilla que se adapta sola: coloca tantas tarjetas como quepan, con un
+   ancho mínimo de 15rem cada una. */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
   gap: 1.4rem;
 }
 
+/* Tarjeta de producto: imagen, nombre y precio. */
 .product-card {
   border: 0.1rem solid var(--border);
   border-radius: 1rem;
@@ -722,6 +780,7 @@ tbody tr:hover {
 }
 
 /* ---------- Modal ---------- */
+/* Capa oscura que cubre la pantalla y centra la ventana emergente (modal). */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -733,6 +792,7 @@ tbody tr:hover {
   animation: fadeIn 0.15s ease;
 }
 
+/* La ventana emergente en sí (blanca, redondeada y con sombra). */
 .modal {
   background: #fff;
   border-radius: 1.2rem;
@@ -801,6 +861,7 @@ tbody tr:hover {
 }
 
 /* ---------- Carrito ---------- */
+/* Miniatura de producto dentro del carrito del POS. */
 .cart-thumb {
   width: 3.4rem;
   height: 3.4rem;
@@ -843,6 +904,7 @@ tbody tr:hover {
 }
 
 /* ---------- Ventas ---------- */
+/* Filas de la tabla de ventas que se pueden pulsar para ver el detalle. */
 .venta-row {
   cursor: pointer;
 }
@@ -856,6 +918,7 @@ tbody tr:hover {
 }
 
 /* ---------- Danger button ---------- */
+/* Botón de acción destructiva (eliminar): se pinta rojo al pasar el ratón. */
 button.danger:hover {
   background: var(--danger);
   color: #fff;
@@ -863,6 +926,7 @@ button.danger:hover {
 }
 
 /* ---------- Loading screen ---------- */
+/* Pantalla completa con el texto "Cargando…" mientras se verifica la sesión. */
 .loading-screen {
   min-height: 100vh;
   display: flex;
@@ -873,6 +937,8 @@ button.danger:hover {
 }
 
 /* ---------- File label (input de imagen) ---------- */
+/* Etiqueta con apariencia de botón que abre el selector de archivos
+   (se usa junto a un <input type="file"> oculto). */
 .file-label {
   display: inline-flex;
   align-items: center;
@@ -897,9 +963,13 @@ button.danger:hover {
 
 /* ==========================================================================
    RESPONSIVE (tablet / móvil)
+   A partir de aquí se ajusta el diseño para pantallas pequeñas usando
+   @media. En escritorio estas reglas no aplican.
    ========================================================================== */
 
 /* ---------- Desktop por defecto: ocultar elementos móviles ---------- */
+/* Elementos que solo deben verse en móvil (barra superior, fondo oscuro del
+   menú y barra inferior del POS). En escritorio se ocultan. */
 .topbar-mobile,
 .backdrop,
 .pos-bar {
@@ -937,6 +1007,9 @@ button.danger:hover {
 }
 
 @media (max-width: 1024px) {
+  /* A partir de 1024px (tablet/móvil) cambiamos a un diseño más compacto:
+     el sidebar se vuelve un menú deslizable y las tablas se apilan como
+     tarjetas. */
   /* ---------- Topbar móvil ---------- */
   .topbar-mobile {
     display: flex;
@@ -1433,6 +1506,8 @@ button.danger:hover {
 }
 
 /* ---------- Pizarra ---------- */
+/* Tablero de notas/recordatorios: columnas de tarjetas con prioridad y
+   acciones (completar, archivar, editar). */
 .card-link {
   text-decoration: none;
   color: inherit;
