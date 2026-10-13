@@ -7,6 +7,16 @@ de software de acuerdo con el diseño y metodologías de desarrollo*).
 **Aprendiz:** Juan Felipe López Tobón
 **Programa:** Tecnología en Análisis y Desarrollo de Software (SENA)
 
+## Nota sobre este repositorio
+
+Este repositorio es una **copia (clon) académica** del sistema que desarrollé para mi
+cafetería, el cual **ya se encuentra en producción y en funcionamiento**.
+
+Para esta entrega del SENA se **eliminó la información sensible** (datos y decisiones del
+negocio, credenciales, configuración de producción y notas privadas), dejando únicamente el
+**código fuente comentado con fines educativos**. Por eso el historial de cambios es el del
+proyecto real, pero sin el contenido reservado.
+
 ## Evidencias incluidas
 
 | Evidencia | Componente | Carpeta |
@@ -38,4 +48,4 @@ de software de acuerdo con el diseño y metodologías de desarrollo*).
 - **Módulo web:** Java + Servlets + JSP + JDBC (SQLite) con Maven.
 - **Base de datos:** SQLite (desarrollo).
 
-Este repositorio es la entrega académica del proyecto; todo el código está comentado.
+Todo el código está comentado para facilitar su lectura y evaluación.
